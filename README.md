@@ -1,2 +1,2 @@
 # SeniorDesign
-Repository for our senior design project
+Senior Project: Evolutionary Algorithm for Logic Design
