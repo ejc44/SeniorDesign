@@ -98,7 +98,7 @@ public class BooleanTree {
 			}
 			else if (i < num_inputs*2) // Inverted variables
 			{
-				input_nodes[i] = new Node(X1NOT+(i-num_inputs), false);
+				input_nodes[i] = new Node(X1NOT+i, false);
 			}
 			else if (i == num_inputs*2) // Low
 			{
@@ -182,21 +182,21 @@ public class BooleanTree {
 	
 		ArrayList<Node> level_children = new ArrayList<Node>();
 		
-		System.out.println("\nParent : Children\n");
+		System.out.println("Parent : Children");
 		
 		for (int i = 0; i< num_input_nodes; i++)
 		{
-			if(((all_nodes.get(i+1)).children).size() > 0) // If input has a child
+			if((all_nodes[i+1].children).size() > 0) // If input has a child
 			{
-				print_gate(all_nodes.get(i+1)); // Print the input node
-				System.out.print(": ");
+				print_gate(all_nodes[i+1]); // Print the input node
+				System.out.println(": ");
 				
-				for (int j=0; j< ((all_nodes.get(i+1)).children).size(); j++) // Print all of its children
+				for (int j=0; j< (all_nodes[i+1].children).size(); j++) // Print all of its children
 				{
-					print_gate(((all_nodes.get(i+1)).children).get(j));
-					if(level_children.contains(((all_nodes.get(i+1)).children).get(j)) == false)
+					print_gate((all_nodes[i+1].children)[j]);
+					if(level_children.contains((all_nodes[i+1].children)[j]) == false)
 					{
-						level_children.add(((all_nodes.get(i+1)).children).get(j)); // Store its children
+						level_children.add((all_nodes[i+1].children)[j]); // Store its children
 					}
 				}
 				System.out.println();
@@ -209,17 +209,17 @@ public class BooleanTree {
 			
 			for (int i =0; i < level_children.size(); i++)
 			{
-				if (((level_children.get(i)).children).size() > 0)
+				if ((level_children[i].children).size() > 0)
 				{
-					print_gate((level_children.get(i))); // Print the input node
-					System.out.print(": ");
+					print_gate(level_children[i+1]); // Print the input node
+					System.out.println(": ");
 				
-				for (int j=0; j< ((level_children.get(i)).children).size(); j++) // Print all of its children
+				for (int j=0; j< (level_children[i+1].children).size(); j++) // Print all of its children
 				{
-					print_gate(((level_children.get(i)).children).get(j));
-					if(new_children.contains(((level_children.get(i)).children).get(j)) == false)
+					print_gate((level_children[i+1].children)[j]);
+					if(new_children.contains((all_nodes[i+1].children)[j]) == false)
 					{
-						new_children.add(((level_children.get(i)).children).get(j)); // Store its children
+						new_children.add((all_nodes[i+1].children)[j]); // Store its children
 					}
 				}
 				System.out.println();
@@ -228,7 +228,7 @@ public class BooleanTree {
 			}
 			
 			level_children.clear();
-			level_children = new ArrayList<Node>(new_children);
+			level_children = new_children.clone();
 			new_children.clear();
 		}
 	
@@ -276,22 +276,22 @@ public class BooleanTree {
 				System.out.print("1 ");
 				break;
 			case 30:
-				System.out.print("AND"+all_nodes.indexOf(desired_node)+" ");
+				System.out.print("AND ");
 				break;
 			case 31:
-				System.out.print("OR"+all_nodes.indexOf(desired_node)+" ");
+				System.out.print("OR ");
 				break;
 			case 32:
-				System.out.print("NAND"+all_nodes.indexOf(desired_node)+" ");
+				System.out.print("NAND ");
 				break;
 			case 33:
-				System.out.print("NOR"+all_nodes.indexOf(desired_node)+" ");
+				System.out.print("NOR ");
 				break;
 			case 34:
-				System.out.print("XOR"+all_nodes.indexOf(desired_node)+" ");
+				System.out.print("XOR ");
 				break;
 			case 35:
-				System.out.print("XNOR"+all_nodes.indexOf(desired_node)+" ");
+				System.out.print("XNOR ");
 				break;
 		}	
 	}
