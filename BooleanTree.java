@@ -176,6 +176,128 @@ public class BooleanTree {
 	}
 	
 	
+	public void print_tree()
+	{
+		int num_input_nodes = num_inputs*2+2;
+	
+		ArrayList<Node> level_children = new ArrayList<Node>();
+		
+		System.out.println("Parent : Children");
+		
+		for (int i = 0; i< num_input_nodes; i++)
+		{
+			if((all_nodes[i+1].children).size() > 0) // If input has a child
+			{
+				print_gate(all_nodes[i+1]); // Print the input node
+				System.out.println(": ");
+				
+				for (int j=0; j< (all_nodes[i+1].children).size(); j++) // Print all of its children
+				{
+					print_gate((all_nodes[i+1].children)[j]);
+					if(level_children.contains((all_nodes[i+1].children)[j]) == false)
+					{
+						level_children.add((all_nodes[i+1].children)[j]); // Store its children
+					}
+				}
+				System.out.println();
+			}
+		}
+		
+		while(level_children.size() > 0) // While are children
+		{
+			ArrayList<Node> new_children = new ArrayList<Node>();
+			
+			for (int i =0; i < level_children.size(); i++)
+			{
+				if ((level_children[i].children).size() > 0)
+				{
+					print_gate(level_children[i+1]); // Print the input node
+					System.out.println(": ");
+				
+				for (int j=0; j< (level_children[i+1].children).size(); j++) // Print all of its children
+				{
+					print_gate((level_children[i+1].children)[j]);
+					if(new_children.contains((all_nodes[i+1].children)[j]) == false)
+					{
+						new_children.add((all_nodes[i+1].children)[j]); // Store its children
+					}
+				}
+				System.out.println();
+				
+				}
+			}
+			
+			level_children.clear();
+			level_children = new_children.clone();
+			new_children.clear();
+		}
+	
+	}
+	
+	
+	private void print_gate(Node desired_node)
+	{
+		switch(desired_node.gate_type) // Print the desired node node
+		{
+			case 0:
+				System.out.print("X1 "); 
+				break;
+			case 1:
+				System.out.print("X2 "); 
+				break;
+			case 2:
+				System.out.print("X3 ");
+				break;
+			case 3:
+				System.out.print("X4 "); 
+				break;
+			case 4:
+				System.out.print("X5 "); 
+				break;
+			case 10:
+				System.out.print("X1' ");
+				break;
+			case 11:
+				System.out.print("X2' "); 
+				break;
+			case 12:
+				System.out.print("X3' "); 
+				break;
+			case 13:
+				System.out.print("X4' "); 
+				break;
+			case 14:
+				System.out.print("X5' ");
+				break;
+			case 20:
+				System.out.print("0 ");
+				break;
+			case 21:
+				System.out.print("1 ");
+				break;
+			case 30:
+				System.out.print("AND ");
+				break;
+			case 31:
+				System.out.print("OR ");
+				break;
+			case 32:
+				System.out.print("NAND ");
+				break;
+			case 33:
+				System.out.print("NOR ");
+				break;
+			case 34:
+				System.out.print("XOR ");
+				break;
+			case 35:
+				System.out.print("XNOR ");
+				break;
+		}	
+	}
+	
+	
+	
 	//---------------------------- End of completed work -----------------------------
 	
 	// Tells tree to mutate
