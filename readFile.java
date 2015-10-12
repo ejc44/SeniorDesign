@@ -74,6 +74,6 @@ public class readFile {
 		}
 		
 		BooleanTree test = new BooleanTree(numVars, table, sumOfProducts, sopTerms); // Generate the BooleanTree for the input truth table
-		
+		test.print_tree():
 	}
 }
