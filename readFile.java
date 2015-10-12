@@ -1,6 +1,7 @@
 import java.io.*;
 import java.lang.Math;
 
+
 public class readFile {
 	public static void main(String [] args) throws IOException {
 		int numVars = Integer.parseInt(args[0]);
@@ -69,5 +70,8 @@ public class readFile {
 				}
 			}
 		}
+		
+		BooleanTree test = new BooleanTree(numVars, table, sumOfProducts, sopTerms); // Generate the BooleanTree for the input truth table
+		
 	}
 }
