@@ -25,13 +25,15 @@ public class readFile {
 				if(line.indexOf(",") > 0) {
 					String [] hold = line.split(",");
 
+					table[i]=Integer.parseInt(hold[numVars]);
+
 					if(Integer.parseInt(hold[numVars]) == 1) {
 						for(int j=0;j<numVars;j++) {
-							sumOfProducts[i][j] = Integer.parseInt(hold[j]);
+							sumOfProducts[sopTerms][j] = Integer.parseInt(hold[j]);
 						}
-						i++;
 						sopTerms++;
 					}
+					i++;
 				} else {
 					convert = 1;
 
@@ -73,6 +75,5 @@ public class readFile {
 		
 		BooleanTree test = new BooleanTree(numVars, table, sumOfProducts, sopTerms); // Generate the BooleanTree for the input truth table
 		test.print_tree();
-		
 	}
 }

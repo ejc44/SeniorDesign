@@ -337,22 +337,59 @@ public class BooleanTree {
 	// Delete an input from the network
 	private void deleteInput()
 	{
-		Node removed = selectNode(true); // Choose the node to remove
-	
+		Node child = selectNode(false); // Choose the child
+		
+		while((child.parents).size() < 3 ) {
+			child = selectNode(false);
+		}
+
+		int rand = random_generator.nextInt((child.parents).size());
+
+		Node input = (child.parents).get(rand);
+		(child.parents).remove(input);
+		(input.children).remove(child);
 	}
 	
 	// Add an input to the network
 	private void addInput()
 	{
 		Node child = selectNode(false); // Choose the child
-	
+		Node input = selectNode(true);
+
+		while((child.parents).contains(input)) {
+			input = selectNode(true);
+		}
+
+		connectNodes(input,child);
 	}
 	
 	// Change the gate type of a node
 	private void changeType()
 	{
 		Node mutated = selectNode(false); // Choose the node to change
-	
+		
+		int new_gate = random_generator.nextInt(6);
+
+		switch(new_gate) {
+			case 0:
+				mutated.gate_type = AND;
+			break;
+			case 1:
+				mutated.gate_type = OR;
+			break;
+			case 2:
+				mutated.gate_type = NAND;
+			break;
+			case 3:
+				mutated.gate_type = NOR;
+			break;
+			case 4:
+				mutated.gate_type = XOR;
+			break;
+			case 5:
+				mutated.gate_type = XNOR;
+			break;
+		}
 	}
 	
 	// Remove a gate
@@ -360,6 +397,32 @@ public class BooleanTree {
 	{
 		Node removed = selectNode(false); // Choose the node to remove
 	
+		while(removed.is_root==true) {
+			removed = selectNode(false);
+		}
+
+
+		/*
+		for(int i=0;i<(removed.parents).size();i++) {
+			for(int j=0;j<(removed.children).size();j++) {
+				connectNodes((removed.parents).get(i),(removed.children).get(j));
+			}
+		}
+
+		for(int i=0;i<(removed.parents).size();i++) {
+			Node par = (removed.parents).get(i);
+
+			(par.children).remove(removed);
+		}
+
+		for(int i=0;i<(removed.children).size();i++) {
+			Node child = (removed.children).get(i);
+
+			(child.parents).remove(removed);
+		}
+
+		all_nodes.remove(removed);
+		*/
 	}
 	
 	// Add a gate
@@ -380,8 +443,17 @@ public class BooleanTree {
 	// Selects Node to mutate
 	private Node selectNode(boolean isInput)
 	{
-	
-		return null;
+		int s = all_nodes.size();
+
+		int rand = random_generator.nextInt(s);
+		Node selected = all_nodes.get(rand);
+
+		while(selected.is_input != isInput) {
+			rand = random_generator.nextInt(s);
+			selected = all_nodes.get(rand);
+		}
+
+		return selected;
 	}
 	
 
