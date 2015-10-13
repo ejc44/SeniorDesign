@@ -148,6 +148,12 @@ public class BooleanTree {
 		(parent.children).add(child); // Add the child to the parent's children list
 		(child.parents).add(parent); // Add the parent to the child's children list
 	}
+
+	// Disconnect two nodes
+	private void disconnectNodes(Node parent, Node child) {
+		(child.parents).remove(parent);	// Remove the parent from the child's parents list
+		(parent.children).remove(child);	// Remove the child from the parent's children list 
+	}
 	
 	
 	// Update the cost variable
@@ -339,27 +345,31 @@ public class BooleanTree {
 	{
 		Node child = selectNode(false); // Choose the child
 		
+		// Find a new child if the child has less than 3 inputs
 		while((child.parents).size() < 3 ) {
 			child = selectNode(false);
 		}
 
+		// Select random input
 		int rand = random_generator.nextInt((child.parents).size());
-
 		Node input = (child.parents).get(rand);
-		(child.parents).remove(input);
-		(input.children).remove(child);
+
+		// Remove connection
+		disconnectNodes(input,child);
 	}
 	
 	// Add an input to the network
 	private void addInput()
 	{
 		Node child = selectNode(false); // Choose the child
-		Node input = selectNode(true);
+		Node input = selectNode(true);	// Choose the input
 
+		// Choose new input if it is already connected
 		while((child.parents).contains(input)) {
 			input = selectNode(true);
 		}
 
+		// Connect input
 		connectNodes(input,child);
 	}
 	
@@ -368,28 +378,16 @@ public class BooleanTree {
 	{
 		Node mutated = selectNode(false); // Choose the node to change
 		
-		int new_gate = random_generator.nextInt(6);
+		// Choose random new gate
+		int new_gate = 30 + random_generator.nextInt(6);
 
-		switch(new_gate) {
-			case 0:
-				mutated.gate_type = AND;
-			break;
-			case 1:
-				mutated.gate_type = OR;
-			break;
-			case 2:
-				mutated.gate_type = NAND;
-			break;
-			case 3:
-				mutated.gate_type = NOR;
-			break;
-			case 4:
-				mutated.gate_type = XOR;
-			break;
-			case 5:
-				mutated.gate_type = XNOR;
-			break;
+		// Choose a different gate type if it's the current gate type
+		while(mutated.gate_type == new_gate) {
+			new_gate = 30 + random_generator.nextInt(6);
 		}
+
+		// Change the gate type
+		mutated.gate_type = new_gate;
 	}
 	
 	// Remove a gate
@@ -397,30 +395,35 @@ public class BooleanTree {
 	{
 		Node removed = selectNode(false); // Choose the node to remove
 	
+		// Find a new node if the random node is the root
 		while(removed.is_root==true) {
 			removed = selectNode(false);
 		}
 
 
 		/*
+		// Connect all of the parents of 'removed' to all of the children of 'removed'
 		for(int i=0;i<(removed.parents).size();i++) {
 			for(int j=0;j<(removed.children).size();j++) {
 				connectNodes((removed.parents).get(i),(removed.children).get(j));
 			}
 		}
 
+		// From 'removed's parents, remove the connection to 'removed'
 		for(int i=0;i<(removed.parents).size();i++) {
 			Node par = (removed.parents).get(i);
 
 			(par.children).remove(removed);
 		}
 
+		// From 'removed's children, remove the connection to 'removed'
 		for(int i=0;i<(removed.children).size();i++) {
 			Node child = (removed.children).get(i);
 
 			(child.parents).remove(removed);
 		}
 
+		// Remove the gate's node completely
 		all_nodes.remove(removed);
 		*/
 	}
@@ -429,14 +432,19 @@ public class BooleanTree {
 	private void addGate()
 	{
 		Node child = selectNode(false); // Choose the child of the new node
-	
 	}
 	
 	// Reassign inputs
 	private void reassignInputs()
 	{
+		// Generate an array list of all the inputs in use
+		ArrayList<Node> inputs = new ArrayList<Node>();
+		for(int i=0;i<all_nodes.size();i++) {
+			if((all_nodes.get(i)).is_input == true) {
+				inputs.add(all_nodes.get(i));
+			}
+		}
 		
-	
 	}
 	
 	
@@ -445,9 +453,12 @@ public class BooleanTree {
 	{
 		int s = all_nodes.size();
 
+		// Select a random node
 		int rand = random_generator.nextInt(s);
 		Node selected = all_nodes.get(rand);
 
+		// Check if the random node matches the given isInput value
+		// If it doesn't match, find a new node
 		while(selected.is_input != isInput) {
 			rand = random_generator.nextInt(s);
 			selected = all_nodes.get(rand);
