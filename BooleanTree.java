@@ -466,7 +466,121 @@ public class BooleanTree {
 
 		return selected;
 	}
-	
 
+
+
+
+
+
+
+
+
+
+	public Node findRoot() {
+		Node root = (all_nodes).get(0);
+		for(int i=0;i<all_nodes.size();i++) {
+			if((all_nodes.get(i)).is_root == true) {
+				root = all_nodes.get(i);
+				break;
+			}
+		}
+		return root;
+	}
+
+	public String print_tree_again(Node child, String s, int level) {
+		if(child.is_root == true) {
+			s = s+"f = ";
+		}
+
+		for(int i=0;i<level;i++) {
+			s = s+"\t";
+		}
+		s = s+gate_string(child);
+		
+		if(child.is_input == false) {
+			s = s+"(\n";
+		}
+		
+		ArrayList<Node> parents = child.parents;
+		
+		for(int i=0;i<parents.size();i++) {
+			s = s+print_tree_again(parents.get(i),"",level+1);
+			
+			if(parents.size()>1 && i<(parents.size()-1)) {
+				s = s+",\n";
+			}
+		}
+		
+		if(child.is_input == false) {
+			s = s+")";
+		}
+		
+		return s;
+	}
+
+	private String gate_string(Node n) {
+		String gate_type="";
+		
+		switch(n.gate_type) { 
+			case 0:
+				gate_type = "X1"; 
+				break;
+			case 1:
+				gate_type = "X2"; 
+				break;
+			case 2:
+				gate_type = "X3";
+				break;
+			case 3:
+				gate_type = "X4"; 
+				break;
+			case 4:
+				gate_type = "X5"; 
+				break;
+			case 10:
+				gate_type = "X1'";
+				break;
+			case 11:
+				gate_type = "X2'"; 
+				break;
+			case 12:
+				gate_type = "X3'"; 
+				break;
+			case 13:
+				gate_type = "X4'"; 
+				break;
+			case 14:
+				gate_type = "X5'";
+				break;
+			case 20:
+				gate_type = "0";
+				break;
+			case 21:
+				gate_type = "1";
+				break;
+			case 30:
+				gate_type = "AND"+all_nodes.indexOf(n);
+				break;
+			case 31:
+				gate_type = "OR"+all_nodes.indexOf(n);
+				break;
+			case 32:
+				gate_type = "NAND"+all_nodes.indexOf(n);
+				break;
+			case 33:
+				gate_type = "NOR"+all_nodes.indexOf(n);
+				break;
+			case 34:
+				gate_type = "XOR"+all_nodes.indexOf(n);
+				break;
+			case 35:
+				gate_type = "XNOR"+all_nodes.indexOf(n);
+				break;
+		}	
+		
+		return gate_type;
+	
+	
+	}
 
 }
