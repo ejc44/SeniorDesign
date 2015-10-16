@@ -344,10 +344,12 @@ public class BooleanTree {
 	private void deleteInput()
 	{
 		Node child = selectNode(false); // Choose the child
+		int loops = 0;
 		
 		// Find a new child if the child has less than 3 inputs
-		while((child.parents).size() < 3 ) {
+		while((child.parents).size() < 3 || loops<5) {
 			child = selectNode(false);
+			loops++;
 		}
 
 		// Select random input
@@ -363,10 +365,12 @@ public class BooleanTree {
 	{
 		Node child = selectNode(false); // Choose the child
 		Node input = selectNode(true);	// Choose the input
+		int loops = 0;
 
 		// Choose new input if it is already connected
-		while((child.parents).contains(input)) {
+		while((child.parents).contains(input) || loops<5) {
 			input = selectNode(true);
+			loops++;
 		}
 
 		// Connect input
@@ -394,10 +398,12 @@ public class BooleanTree {
 	private void deleteGate()
 	{
 		Node removed = selectNode(false); // Choose the node to remove
+		int loops = 0;
 	
 		// Find a new node if the random node is the root
-		while(removed.is_root==true) {
+		while(removed.is_root==true || loops<5) {
 			removed = selectNode(false);
+			loops++;
 		}
 
 
@@ -433,6 +439,22 @@ public class BooleanTree {
 	{
 		Node child = selectNode(false); // Choose the child of the new node
 	}
+
+	// Add connection
+	public void addConnection() {
+		Node child = selectNode(false);
+		Node newPar = selectNode(false);
+		int loops = 0;
+
+		while((child == newPar || (child.parents).contains(newPar)) && loops<5) {
+			newPar = selectNode(false);
+			loops++;
+			System.out.println(loops);
+		}
+
+		connectNodes(newPar,child);
+
+	}
 	
 	// Reassign inputs
 	private void reassignInputs()
@@ -466,6 +488,12 @@ public class BooleanTree {
 
 		return selected;
 	}
+
+
+
+
+
+
 
 
 

@@ -18,8 +18,9 @@ public class optimalMain {
 
 		int index = chooseTable(numVars);
 
+		String indexFilename = "/"+numVars+"var/"+index+".txt";
 		try {
-			BufferedReader buff = new BufferedReader(new FileReader('/'+numVars+'var/'+index+'.txt'));
+			BufferedReader buff = new BufferedReader(new FileReader(indexFilename));
 		} catch (IOException e) {
 			System.out.println("File not found");
 		}
