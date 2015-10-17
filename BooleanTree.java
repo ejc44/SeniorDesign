@@ -1,7 +1,6 @@
 /*
 	Can generate a canonical SOP network
-	Cannot yet actually mutate anything
-	Need to figure out how to print network so can check results better
+	
 */
 
 import java.util.*;
@@ -159,11 +158,21 @@ public class BooleanTree {
 	// Update the cost variable
 	private void calcCost()
 	{
+		// First remove any now unconnected nodes (excluding inputs and root)
+		for (int i = 0; i < all_nodes.size(); i++)
+		{
+			if (((node.parents).size == 0) && ((node.children).size == 0) && !node.is_root && !node.is_input) // If no children, parents, and not an input or root, remove it
+			{
+				all_nodes.remove(i);
+			}	
+		}	
+	
+		// Find cost
 		cost = all_nodes.size(); // Number of nodes
 		
 		for (int i = 0; i < all_nodes.size(); i++)
 		{
-			Node node_i = all_nodes.get(i); // Iterate over each node in array list
+			Node node_i = all_nodes.get(i); // Iterate over each node in array list		
 			if (node_i.is_input)
 			{
 				cost = cost - 1; // Remove from number of nodes
@@ -309,47 +318,60 @@ public class BooleanTree {
 	// Tells tree to mutate
 	public void mutate()
 	{
-		double p = random_generator.nextDouble(); // Generate a probability
+		boolean mutate_success = false;
 		
-		// Choose type of mutation
-		// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
-		if (p < 0.2)
+		while (mutate_success != true)
 		{
-			deleteInput();
-		}
-		else if (p < 0.4)
-		{
-			addInput();
-		}
-		else if (p < 0.5)
-		{
-			changeType();
-		}
-		else if (p < 0.6)
-		{
-			deleteGate();
-		}
-		else if (p < 0.8)
-		{
-			addGate();
-		}
-		else
-		{
-			reassignInputs();
-		}
-		
+			double p = random_generator.nextDouble(); // Generate a probability
+			
+			// Choose type of mutation
+			// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
+			if (p < 0.2)
+			{
+				mutate_success = deleteInput();
+			}
+			else if (p < 0.4)
+			{
+				mutate_success = addInput();
+			}
+			else if (p < 0.5)
+			{
+				mutate_success = changeType();
+			}
+			else if (p < 0.6)
+			{
+				mutate_success = deleteGate();
+			}
+			else if (p < 0.8)
+			{
+				mutate_success = addGate();
+			}
+			else if (P < 0.9)
+			{
+				mutate_success = addConenction();
+			}
+			else
+			{
+				mutate_success = reassignInputs();
+			}	
+		}	
 	}
 	
 	// Delete an input from the network
-	private void deleteInput()
+	private boolean deleteInput()
 	{
 		Node child = selectNode(false); // Choose the child
 		int loops = 0;
 		
 		// Find a new child if the child has less than 3 inputs
-		while((child.parents).size() < 3 || loops<5) {
+		while((child.parents).size() < 3 && loops<5) {
 			child = selectNode(false);
 			loops++;
+		}
+		
+		if ((child.parents).size() < 3) // Did not find a node with more than 2 inputs
+		{
+			return false;
 		}
 
 		// Select random input
@@ -361,19 +383,29 @@ public class BooleanTree {
 
 		// Recalculate cost;
 		calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;
 	}
 	
 	// Add an input to the network
-	private void addInput()
+	private boolean addInput()
 	{
 		Node child = selectNode(false); // Choose the child
 		Node input = selectNode(true);	// Choose the input
 		int loops = 0;
 
 		// Choose new input if it is already connected
-		while((child.parents).contains(input) || loops<5) {
+		while((child.parents).contains(input) && loops<5) {
 			input = selectNode(true);
 			loops++;
+		}
+		
+		if ((child.parents).contains(input)) // If still connected
+		{
+			return false;
 		}
 
 		// Connect input
@@ -381,27 +413,47 @@ public class BooleanTree {
 
 		// Recalculate cost;
 		calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;
 	}
 	
 	// Change the gate type of a node
-	private void changeType()
+	private boolean changeType()
 	{
 		Node mutated = selectNode(false); // Choose the node to change
+		int loops = 0;
 		
 		// Choose random new gate
 		int new_gate = 30 + random_generator.nextInt(6);
 
 		// Choose a different gate type if it's the current gate type
-		while(mutated.gate_type == new_gate) {
+		while(mutated.gate_type == new_gate && loops < 5) {
 			new_gate = 30 + random_generator.nextInt(6);
+			loops++;
 		}
 
+		if (mutated.gate_type == new_gate) // If gate type did not change
+		{
+			return false;
+		}
+		
 		// Change the gate type
 		mutated.gate_type = new_gate;
+		
+		// Recalculate cost - currently unnecessary, but could change with different gate types
+		calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;
 	}
 	
 	// Remove a gate
-	private void deleteGate()
+	private boolean deleteGate()
 	{
 		Node removed = selectNode(false); // Choose the node to remove
 		int loops = 0;
@@ -411,9 +463,13 @@ public class BooleanTree {
 			removed = selectNode(false);
 			loops++;
 		}
+		
+		if(removed.is_root==true) // If still have selected root
+		{
+			return false;
+		}
 
 
-		/*
 		// Connect all of the parents of 'removed' to all of the children of 'removed'
 		for(int i=0;i<(removed.parents).size();i++) {
 			for(int j=0;j<(removed.children).size();j++) {
@@ -424,55 +480,145 @@ public class BooleanTree {
 		// From 'removed's parents, remove the connection to 'removed'
 		for(int i=0;i<(removed.parents).size();i++) {
 			Node par = (removed.parents).get(i);
-
-			(par.children).remove(removed);
+			disconnectNodes(par, removed);
 		}
 
 		// From 'removed's children, remove the connection to 'removed'
 		for(int i=0;i<(removed.children).size();i++) {
 			Node child = (removed.children).get(i);
-
-			(child.parents).remove(removed);
+			disconnectNodes(removed, child);
 		}
 
 		// Remove the gate's node completely
-		all_nodes.remove(removed);
-		*/
+		all_nodes.remove(removed);		
+		
+		// Recalculate cost
+		calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;		
 	}
 	
 	// Add a gate
-	private void addGate()
+	private boolean addGate()
 	{
 		Node child = selectNode(false); // Choose the child of the new node
+		
+		// Choose parent nodes (currently cannot be inputs)
+		Node parent1 = selectNode(false);
+		Node parent2 = selectNode(false);
+		
+		// Need to check for cyclic-ness
+		boolean cylic1 = isCyclic(parent1, child);
+		boolean cyclic2 = isCyclic(parent2, child);
+		int loop1 = 0;
+		int loop2 = 0;
+		if (cyclic1 && loop1 < 5) // Choose new parent if cyclic
+		{
+			parent1 = selectNode(false);
+			cylic1 = isCyclic(parent1, child);
+			loop1++;
+		}
+		if (cyclic2 && loop2 < 5)
+		{
+			parent2 = selectNode(false);
+			cylic2 = isCyclic(parent2, child);
+			loop2++;
+		}
+		if (cylic1 || cylic2)
+		{
+			return false;
+		}
+		
+		Node new_node = new Node(30 + random_generator.nextInt(6),false); // Add a new gate
+		
+		// Connect nodes
+		connectNodes(parent1, new_node);
+		connectNodes(parent2, new_node);
+		connectNodes(new_node, child);
+		
+		// Recalculate cost
+		calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;		
 	}
 
 	// Add connection
-	public void addConnection() {
+	public boolean addConnection() {
 		Node child = selectNode(false);
 		Node newPar = selectNode(false);
 		int loops = 0;
 
-		while((child == newPar || (child.parents).contains(newPar)) && loops<5) {
+		// Need to check for cyclic-ness
+		boolean cylic = isCyclic(newPar, child);
+		int loop = 0;
+		if (cyclic && loop < 5) // Choose new parent if cyclic
+		{
 			newPar = selectNode(false);
-			loops++;
-			System.out.println(loops);
+			cylic = isCyclic(newPar, child);
+			loop++;
 		}
-
+		if (cylic)
+		{
+			return false;
+		}
+		
 		connectNodes(newPar,child);
+		
+		// Recalculate cost
+		calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;		
 
 	}
 	
 	// Reassign inputs
 	private void reassignInputs()
 	{
-		// Generate an array list of all the inputs in use
+		/*// Generate an array list of all the inputs in use
 		ArrayList<Node> inputs = new ArrayList<Node>();
 		for(int i=0;i<all_nodes.size();i++) {
 			if((all_nodes.get(i)).is_input == true) {
 				inputs.add(all_nodes.get(i));
 			}
+		}*/
+		
+		// Rassign inputs in cyclic order
+		for(int i=0;i<all_nodes.size();i++) 
+		{
+			Node curr_node = all_nodes.get(i);
+			if(curr_node.is_input == true) 
+			{
+				if((curr_node.gate_type < 3) || (curr_node.gate_type < 13 && curr_node.gate_type > 4) || (curr_node.gate_type == 20))
+				{
+					curr_node.gate_type += 1;
+				}
+				else if (curr_node.gate_type == 4 || curr_node.gate_type == 14)
+				{
+					curr_node.gate_type += 6;
+				}
+				else
+				{
+					curr_node.gate_type = 0;
+				}
+			}
 		}
 		
+		// Recalculate cost -- unnecessary
+		//calcCost();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;		
 	}
 	
 	
@@ -493,6 +639,52 @@ public class BooleanTree {
 		}
 
 		return selected;
+	}
+	
+	// Check if two nodes trying to connect will be cyclically connected
+	private boolean isCyclic(Node par, Node child)
+	{
+		
+		ArrayList<Nodes> descendants = new ArrayList<Nodes>; // All of child's descendants
+		
+		for (i = 0; i < child.size(); i++)
+		{
+			Node curr = (child.children).get(i);
+			if (curr == par) // Break if cyclic
+			{
+				return true;
+			}
+			else
+			{
+				descendants.add(curr);
+			}
+		}
+	
+		
+		while(descendants.size() > 0) // While are descendants
+		{
+			ArrayList<Node> new_children = new ArrayList<Node>();
+			
+			for (int i =0; i < descendants.size(); i++)
+			{
+				Node curr = descendants.get(i);
+				
+				if (curr == par) // Break if cyclic
+				{
+					return true;
+				}
+				else
+				{
+					new_children.add(curr);
+				}
+			}
+			
+			descendants.clear();
+			descendants = new ArrayList<Node>(new_children);
+			new_children.clear();
+		}
+		
+		return false;
 	}
 
 
