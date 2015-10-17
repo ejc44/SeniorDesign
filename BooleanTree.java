@@ -161,7 +161,8 @@ public class BooleanTree {
 		// First remove any now unconnected nodes (excluding inputs and root)
 		for (int i = 0; i < all_nodes.size(); i++)
 		{
-			if (((node.parents).size == 0) && ((node.children).size == 0) && !node.is_root && !node.is_input) // If no children, parents, and not an input or root, remove it
+			Node curr = all_nodes.get(i);
+			if (((curr.parents).size() == 0) && ((curr.children).size() == 0) && !curr.is_root && !curr.is_input) // If no children, parents, and not an input or root, remove it
 			{
 				all_nodes.remove(i);
 			}	
@@ -346,9 +347,9 @@ public class BooleanTree {
 			{
 				mutate_success = addGate();
 			}
-			else if (P < 0.9)
+			else if (p < 0.9)
 			{
-				mutate_success = addConenction();
+				mutate_success = addConnection();
 			}
 			else
 			{
@@ -511,23 +512,23 @@ public class BooleanTree {
 		Node parent2 = selectNode(false);
 		
 		// Need to check for cyclic-ness
-		boolean cylic1 = isCyclic(parent1, child);
+		boolean cyclic1 = isCyclic(parent1, child);
 		boolean cyclic2 = isCyclic(parent2, child);
 		int loop1 = 0;
 		int loop2 = 0;
 		if (cyclic1 && loop1 < 5) // Choose new parent if cyclic
 		{
 			parent1 = selectNode(false);
-			cylic1 = isCyclic(parent1, child);
+			cyclic1 = isCyclic(parent1, child);
 			loop1++;
 		}
 		if (cyclic2 && loop2 < 5)
 		{
 			parent2 = selectNode(false);
-			cylic2 = isCyclic(parent2, child);
+			cyclic2 = isCyclic(parent2, child);
 			loop2++;
 		}
-		if (cylic1 || cylic2)
+		if (cyclic1 || cyclic2)
 		{
 			return false;
 		}
@@ -555,15 +556,15 @@ public class BooleanTree {
 		int loops = 0;
 
 		// Need to check for cyclic-ness
-		boolean cylic = isCyclic(newPar, child);
+		boolean cyclic = isCyclic(newPar, child);
 		int loop = 0;
 		if (cyclic && loop < 5) // Choose new parent if cyclic
 		{
 			newPar = selectNode(false);
-			cylic = isCyclic(newPar, child);
+			cyclic = isCyclic(newPar, child);
 			loop++;
 		}
-		if (cylic)
+		if (cyclic)
 		{
 			return false;
 		}
@@ -581,7 +582,7 @@ public class BooleanTree {
 	}
 	
 	// Reassign inputs
-	private void reassignInputs()
+	private boolean reassignInputs()
 	{
 		/*// Generate an array list of all the inputs in use
 		ArrayList<Node> inputs = new ArrayList<Node>();
@@ -645,9 +646,9 @@ public class BooleanTree {
 	private boolean isCyclic(Node par, Node child)
 	{
 		
-		ArrayList<Nodes> descendants = new ArrayList<Nodes>; // All of child's descendants
+		ArrayList<Node> descendants = new ArrayList<Node>(); // All of child's descendants
 		
-		for (i = 0; i < child.size(); i++)
+		for (int i = 0; i < (child.children).size(); i++)
 		{
 			Node curr = (child.children).get(i);
 			if (curr == par) // Break if cyclic
@@ -687,7 +688,10 @@ public class BooleanTree {
 		return false;
 	}
 
-
+	private void updateTable()
+	{
+	
+	}
 
 
 
