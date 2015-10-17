@@ -358,6 +358,9 @@ public class BooleanTree {
 
 		// Remove connection
 		disconnectNodes(input,child);
+
+		// Recalculate cost;
+		calcCost();
 	}
 	
 	// Add an input to the network
@@ -375,6 +378,9 @@ public class BooleanTree {
 
 		// Connect input
 		connectNodes(input,child);
+
+		// Recalculate cost;
+		calcCost();
 	}
 	
 	// Change the gate type of a node
@@ -502,9 +508,11 @@ public class BooleanTree {
 
 
 
+	public String printNetwork() {
+		return print_tree_again(findRoot(),"",0);
+	}
 
-
-	public Node findRoot() {
+	private Node findRoot() {
 		Node root = (all_nodes).get(0);
 		for(int i=0;i<all_nodes.size();i++) {
 			if((all_nodes.get(i)).is_root == true) {
@@ -515,7 +523,7 @@ public class BooleanTree {
 		return root;
 	}
 
-	public String print_tree_again(Node child, String s, int level) {
+	private String print_tree_again(Node child, String s, int level) {
 		if(child.is_root == true) {
 			s = s+"f = ";
 		}

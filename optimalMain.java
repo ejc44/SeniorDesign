@@ -9,21 +9,49 @@ public class optimalMain {
 
 		String[] lines = readUserTableFile(numVars, truthTableFilename);
 		int[] table = getTableFromFile(numVars,lines);
-		int[][] sumOfProducts = getSumOfProducts(numVars,table);
-		int sopTerms = getSOPTerms(table);
-	
-		BooleanTree test = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
-		String s = test.print_tree_again(test.findRoot(),"",0);
-		System.out.println(s);
-
-		int index = chooseTable(numVars);
+		int index = calcIndex(table);
 
 		String indexFilename = "/"+numVars+"var/"+index+".txt";
+
+		int[][] sumOfProducts;
+		int sopTerms;
+		BooleanTree network;
+
 		try {
 			BufferedReader buff = new BufferedReader(new FileReader(indexFilename));
+			network = null;
 		} catch (IOException e) {
-			System.out.println("File not found");
+			System.out.println("File does not exist. Creating SOP.\n");
+
+			sumOfProducts = getSumOfProducts(numVars,table);
+			sopTerms = getSOPTerms(table);
+	
+			network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
 		}
+
+		String s = network.printNetwork();
+		System.out.println(s);
+		int cost = network.getCost();
+		System.out.println(cost);
+
+		/*
+		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(indexFilename));
+
+		oos.writeObject(network);
+		oos.flush();
+		oos.close();
+		*/
+
+		// for(int i=0;i<5;i++) {
+		// 	network.mutate();
+
+		// 	cost = network.getCost();
+
+		// 	s = network.printNetwork();
+		// 	System.out.println(s);
+		// 	System.out.println(cost);
+
+		// }
 	}
 
 
