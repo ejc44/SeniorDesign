@@ -144,12 +144,17 @@ public class BooleanTree {
 	// Connect two nodes
 	private void connectNodes(Node parent, Node child)
 	{
+		//System.out.println("Connect nodes");
+		
 		(parent.children).add(child); // Add the child to the parent's children list
 		(child.parents).add(parent); // Add the parent to the child's children list
 	}
 
 	// Disconnect two nodes
-	private void disconnectNodes(Node parent, Node child) {
+	private void disconnectNodes(Node parent, Node child) 
+	{
+		//System.out.println("Disconnect nodes");
+		
 		(child.parents).remove(parent);	// Remove the parent from the child's parents list
 		(parent.children).remove(child);	// Remove the child from the parent's children list 
 	}
@@ -158,6 +163,8 @@ public class BooleanTree {
 	// Update the cost variable
 	private void calcCost()
 	{
+		//System.out.println("Calculating cost");
+		
 		// First remove any now unconnected nodes (excluding inputs and root)
 		for (int i = 0; i < all_nodes.size(); i++)
 		{
@@ -191,7 +198,7 @@ public class BooleanTree {
 		return cost;
 	}
 	
-	
+	/*
 	public void print_tree()
 	{
 		int num_input_nodes = num_inputs*2+2;
@@ -218,6 +225,7 @@ public class BooleanTree {
 				System.out.println();
 			}
 		}
+		
 		
 		while(level_children.size() > 0) // While are children
 		{
@@ -248,7 +256,7 @@ public class BooleanTree {
 			new_children.clear();
 		}
 	
-	}
+	}*/
 	
 	
 	private void print_gate(Node desired_node)
@@ -313,18 +321,17 @@ public class BooleanTree {
 	}
 	
 	
-	
-	//---------------------------- End of completed work -----------------------------
-	
 	// Tells tree to mutate
 	public void mutate()
 	{
+		//System.out.println("Mutating");
+		
 		boolean mutate_success = false;
 		
 		while (mutate_success != true)
 		{
 			double p = random_generator.nextDouble(); // Generate a probability
-			
+			//System.out.println(p);
 			// Choose type of mutation
 			// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
 			if (p < 0.2)
@@ -361,6 +368,8 @@ public class BooleanTree {
 	// Delete an input from the network
 	private boolean deleteInput()
 	{
+		//System.out.println("Deleting input");
+		
 		Node child = selectNode(false); // Choose the child
 		int loops = 0;
 		
@@ -394,6 +403,8 @@ public class BooleanTree {
 	// Add an input to the network
 	private boolean addInput()
 	{
+		//System.out.println("Adding input");
+		
 		Node child = selectNode(false); // Choose the child
 		Node input = selectNode(true);	// Choose the input
 		int loops = 0;
@@ -424,6 +435,8 @@ public class BooleanTree {
 	// Change the gate type of a node
 	private boolean changeType()
 	{
+		//System.out.println("Changing type");
+	
 		Node mutated = selectNode(false); // Choose the node to change
 		int loops = 0;
 		
@@ -456,6 +469,8 @@ public class BooleanTree {
 	// Remove a gate
 	private boolean deleteGate()
 	{
+		//System.out.println("Deleting gate");
+	
 		Node removed = selectNode(false); // Choose the node to remove
 		int loops = 0;
 	
@@ -469,8 +484,8 @@ public class BooleanTree {
 		{
 			return false;
 		}
-
-
+		//System.out.println("Deleting gate2");
+	
 		// Connect all of the parents of 'removed' to all of the children of 'removed'
 		for(int i=0;i<(removed.parents).size();i++) {
 			for(int j=0;j<(removed.children).size();j++) {
@@ -505,7 +520,11 @@ public class BooleanTree {
 	// Add a gate
 	private boolean addGate()
 	{
+		//System.out.println("adding gate");
+	
 		Node child = selectNode(false); // Choose the child of the new node
+		Node new_node = new Node(30 + random_generator.nextInt(6),false); // Add a new gate
+		
 		
 		// Choose parent nodes (currently cannot be inputs)
 		Node parent1 = selectNode(false);
@@ -513,32 +532,42 @@ public class BooleanTree {
 		
 		// Need to check for cyclic-ness
 		boolean cyclic1 = isCyclic(parent1, child);
-		boolean cyclic2 = isCyclic(parent2, child);
 		int loop1 = 0;
-		int loop2 = 0;
-		if (cyclic1 && loop1 < 5) // Choose new parent if cyclic
+		while (cyclic1 && loop1 < 5) // Choose new parent if cyclic
 		{
 			parent1 = selectNode(false);
 			cyclic1 = isCyclic(parent1, child);
 			loop1++;
 		}
-		if (cyclic2 && loop2 < 5)
-		{
-			parent2 = selectNode(false);
-			cyclic2 = isCyclic(parent2, child);
-			loop2++;
-		}
-		if (cyclic1 || cyclic2)
+		if (cyclic1)
 		{
 			return false;
 		}
-		
-		Node new_node = new Node(30 + random_generator.nextInt(6),false); // Add a new gate
-		
-		// Connect nodes
+		all_nodes.add(new_node);
 		connectNodes(parent1, new_node);
-		connectNodes(parent2, new_node);
 		connectNodes(new_node, child);
+		
+		// Now check for cyclic-ness of other parent
+		boolean cyclic2 = isCyclic(parent2, child);
+		int loop2 = 0;
+		
+		while (cyclic2 && loop2 < 5)
+		{
+			parent2 = selectNode(false);
+			cyclic2 = isCyclic(parent2, new_node);
+			loop2++;
+		}
+		if (cyclic2)
+		{
+			disconnectNodes(parent1,new_node);
+			disconnectNodes(new_node,child);
+			all_nodes.remove(new_node);
+			return false;
+		}
+		else
+		{		
+			connectNodes(parent2, new_node);
+		}
 		
 		// Recalculate cost
 		calcCost();
@@ -550,7 +579,10 @@ public class BooleanTree {
 	}
 
 	// Add connection
-	public boolean addConnection() {
+	public boolean addConnection() 
+	{
+		//System.out.println("Adding connection");
+	
 		Node child = selectNode(false);
 		Node newPar = selectNode(false);
 		int loops = 0;
@@ -558,7 +590,7 @@ public class BooleanTree {
 		// Need to check for cyclic-ness
 		boolean cyclic = isCyclic(newPar, child);
 		int loop = 0;
-		if (cyclic && loop < 5) // Choose new parent if cyclic
+		while (cyclic && loop < 5) // Choose new parent if cyclic
 		{
 			newPar = selectNode(false);
 			cyclic = isCyclic(newPar, child);
@@ -584,6 +616,8 @@ public class BooleanTree {
 	// Reassign inputs
 	private boolean reassignInputs()
 	{
+		//System.out.println("Reassigning inputs");
+	
 		/*// Generate an array list of all the inputs in use
 		ArrayList<Node> inputs = new ArrayList<Node>();
 		for(int i=0;i<all_nodes.size();i++) {
@@ -598,17 +632,51 @@ public class BooleanTree {
 			Node curr_node = all_nodes.get(i);
 			if(curr_node.is_input == true) 
 			{
-				if((curr_node.gate_type < 3) || (curr_node.gate_type < 13 && curr_node.gate_type > 4) || (curr_node.gate_type == 20))
+				if (num_inputs == 5)
 				{
-					curr_node.gate_type += 1;
+					if((curr_node.gate_type < 3) || (curr_node.gate_type < 13 && curr_node.gate_type > 4) || (curr_node.gate_type == 20))
+					{
+						curr_node.gate_type += 1;
+					}
+					else if (curr_node.gate_type == 4 || curr_node.gate_type == 14)
+					{
+						curr_node.gate_type += 6;
+					}
+					else
+					{
+						curr_node.gate_type = 0;
+					}
 				}
-				else if (curr_node.gate_type == 4 || curr_node.gate_type == 14)
+				else if (num_inputs == 4)
 				{
-					curr_node.gate_type += 6;
+					if((curr_node.gate_type < 2) || (curr_node.gate_type < 12 && curr_node.gate_type > 3) || (curr_node.gate_type == 20))
+					{
+						curr_node.gate_type += 1;
+					}
+					else if (curr_node.gate_type == 3 || curr_node.gate_type == 13)
+					{
+						curr_node.gate_type += 7;
+					}
+					else
+					{
+						curr_node.gate_type = 0;
+					}
 				}
 				else
-				{
-					curr_node.gate_type = 0;
+				{	
+					if((curr_node.gate_type < 2) || (curr_node.gate_type < 12 && curr_node.gate_type > 3) || (curr_node.gate_type == 20))
+					{
+						curr_node.gate_type += 1;
+					}
+					else if (curr_node.gate_type == 2 || curr_node.gate_type == 12)
+					{
+						curr_node.gate_type += 8;
+					}
+					else
+					{
+						curr_node.gate_type = 0;
+					}
+					
 				}
 			}
 		}
@@ -645,6 +713,7 @@ public class BooleanTree {
 	// Check if two nodes trying to connect will be cyclically connected
 	private boolean isCyclic(Node par, Node child)
 	{
+		//System.out.println("Starting iscyclic");
 		
 		ArrayList<Node> descendants = new ArrayList<Node>(); // All of child's descendants
 		
@@ -660,36 +729,50 @@ public class BooleanTree {
 				descendants.add(curr);
 			}
 		}
-	
+		//System.out.println("iscyclic 2");
 		
 		while(descendants.size() > 0) // While are descendants
 		{
+			//System.out.println("cyclic 3");
+			//System.out.println(descendants.size());
+		
 			ArrayList<Node> new_children = new ArrayList<Node>();
 			
 			for (int i =0; i < descendants.size(); i++)
 			{
 				Node curr = descendants.get(i);
 				
-				if (curr == par) // Break if cyclic
+				for (int j= 0; j < (curr.children).size(); j++)
 				{
-					return true;
-				}
-				else
-				{
-					new_children.add(curr);
+					Node curr_child = (curr.children).get(j);
+					if (curr_child == par) // Break if cyclic
+					{
+						return true;
+					}
+					else
+					{
+						new_children.add(curr_child);
+					}
 				}
 			}
 			
 			descendants.clear();
-			descendants = new ArrayList<Node>(new_children);
+			
+			for (int i =0;i<new_children.size(); i++)
+			{
+				descendants.add(new_children.get(i));
+			}
+			
 			new_children.clear();
 		}
-		
+		//System.out.println("cyclic 4");
 		return false;
 	}
 
 	private void updateTable()
 	{
+		//System.out.println("Updating truth table");
+	
 		int num_entries = (int)Math.pow(2,num_inputs);// Number of entries in the truth table
 		
 		//String expression = Integer.toBinaryString(num_entries);
@@ -699,7 +782,7 @@ public class BooleanTree {
 		{
 			int expression = Integer.valueOf(Integer.toBinaryString(index)); // Number representing binary combination of inputs
 			
-			System.out.print(truth_table[index] + " ");
+			//System.out.print(truth_table[index] + " ");
 			
 			
 			boolean[] input_values = new boolean[num_inputs];
@@ -726,13 +809,16 @@ public class BooleanTree {
 			{
 				truth_table[index] = 0;
 			}
-			System.out.println(truth_table[index]);
+			//System.out.println(truth_table[index]);
 		}
 	}
 	
 	private boolean evaluateNetwork(boolean[] input_values, Node curr)
 	{
 		boolean value = false;
+	
+		//System.out.println("Gate type: " + curr.gate_type);
+		//System.out.println("Parents: " + curr.parents.size());
 	
 		if (curr.is_input)
 		{

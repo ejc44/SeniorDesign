@@ -34,9 +34,10 @@ public class optimalMain {
 		int cost = network.getCost();
 		System.out.println(cost);
 
-		//network.mutate();
-		//s = network.printNetwork();
-		//System.out.println(s);
+		/*network.mutate();
+		System.out.println("Test");
+		s = network.printNetwork();
+		System.out.println(s);*/
 		
 		/*
 		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(indexFilename));
