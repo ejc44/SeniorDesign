@@ -690,7 +690,167 @@ public class BooleanTree {
 
 	private void updateTable()
 	{
+		int num_entries = (int)Math.pow(2,num_inputs);// Number of entries in the truth table
+		
+		//String expression = Integer.toBinaryString(num_entries);
+		//System.out.println(expression);
+		
+		for (int index = 0; index < num_entries; index++)
+		{
+			int expression = Integer.valueOf(Integer.toBinaryString(index)); // Number representing binary combination of inputs
+			
+			System.out.print(truth_table[index] + " ");
+			
+			
+			boolean[] input_values = new boolean[num_inputs];
+			
+			for (int i =0; i<num_inputs; i++) // Set input values (X1 is MSB)
+			{
+				int n = (index >> i) & 1;
+				if (n== 1)
+				{
+					input_values[num_inputs-i-1] = true;
+				}
+				else
+				{
+					input_values[num_inputs-i-1] = false;
+				}
+			}			
+			
+			boolean value = evaluateNetwork(input_values, all_nodes.get(0)); // New truth table value for given entry
+			if (value)
+			{
+				truth_table[index] = 1;
+			}
+			else
+			{
+				truth_table[index] = 0;
+			}
+			System.out.println(truth_table[index]);
+		}
+	}
 	
+	private boolean evaluateNetwork(boolean[] input_values, Node curr)
+	{
+		boolean value = false;
+	
+		if (curr.is_input)
+		{
+			switch(curr.gate_type) // Print the desired node node
+			{
+				case 0: //X1
+					value = input_values[0];
+					break;
+				case 1: //X2
+					value = input_values[1];
+					break;
+				case 2: //X3
+					value = input_values[2];
+					break;
+				case 3: //X4
+					value = input_values[3];
+					break;
+				case 4: //X5
+					value = input_values[4];
+					break;
+				case 10: //X1'
+					value = !input_values[0];
+					break;
+				case 11: //X2'
+					value = !input_values[1];
+					break;
+				case 12: //X3'
+					value = !input_values[2];
+					break;
+				case 13: //X4'
+					value = !input_values[3];
+					break;
+				case 14: //X5'
+					value = !input_values[4];
+					break;
+				case 20: //Low
+					value = false;
+					break;
+				case 21: //High
+					value = true;
+					break;
+			}
+		} 
+		else
+		{
+			int num_true;
+			switch(curr.gate_type) // Print the desired node node
+			{
+				case 30: // AND
+					value = true;
+					for (int i =0; i < (curr.parents).size(); i++)
+					{
+						value = value && evaluateNetwork(input_values, (curr.parents).get(i));
+					}
+					break;
+				case 31: // OR
+					value = false;
+					for (int i =0; i < (curr.parents).size(); i++)
+					{
+						value = value || evaluateNetwork(input_values, (curr.parents).get(i));
+					}
+					break;
+				case 32: //NAND
+					value = true;
+					for (int i =0; i < (curr.parents).size(); i++)
+					{
+						value = value && evaluateNetwork(input_values, (curr.parents).get(i));
+					}
+					value = !value;
+					break;
+				case 33: // NOR
+					value = false;
+					for (int i =0; i < (curr.parents).size(); i++)
+					{
+						value = value || evaluateNetwork(input_values, (curr.parents).get(i));
+					}
+					value = !value;
+					break;
+				case 34:
+					num_true  = 0;
+					for (int i =0; i < (curr.parents).size(); i++)
+					{
+						if(evaluateNetwork(input_values, (curr.parents).get(i)))
+						{
+							num_true++;
+						}
+					}
+					if (num_true%2 == 1)
+					{
+						value = true;
+					}
+					else
+					{
+						value = false;
+					}
+					break;
+				case 35: // XNOR
+					num_true  = 0;
+					for (int i =0; i < (curr.parents).size(); i++)
+					{
+						if(evaluateNetwork(input_values, (curr.parents).get(i)))
+						{
+							num_true++;
+						}
+					}
+					if (num_true%2 == 1)
+					{
+						value = false;
+					}
+					else
+					{
+						value = true;
+					}
+					break;
+				}
+			}
+		
+		return value;
 	}
 
 
