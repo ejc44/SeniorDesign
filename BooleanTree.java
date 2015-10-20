@@ -263,58 +263,58 @@ public class BooleanTree {
 	{
 		switch(desired_node.gate_type) // Print the desired node node
 		{
-			case 0:
+			case X1:
 				System.out.print("X1 "); 
 				break;
-			case 1:
+			case X2:
 				System.out.print("X2 "); 
 				break;
-			case 2:
+			case X3:
 				System.out.print("X3 ");
 				break;
-			case 3:
+			case X4:
 				System.out.print("X4 "); 
 				break;
-			case 4:
+			case X5:
 				System.out.print("X5 "); 
 				break;
-			case 10:
+			case X1NOT:
 				System.out.print("X1' ");
 				break;
-			case 11:
+			case X2NOT:
 				System.out.print("X2' "); 
 				break;
-			case 12:
+			case X3NOT:
 				System.out.print("X3' "); 
 				break;
-			case 13:
+			case X4NOT:
 				System.out.print("X4' "); 
 				break;
-			case 14:
+			case X5NOT:
 				System.out.print("X5' ");
 				break;
-			case 20:
+			case LOW:
 				System.out.print("0 ");
 				break;
-			case 21:
+			case HIGH:
 				System.out.print("1 ");
 				break;
-			case 30:
+			case AND:
 				System.out.print("AND"+all_nodes.indexOf(desired_node)+" ");
 				break;
-			case 31:
+			case OR:
 				System.out.print("OR"+all_nodes.indexOf(desired_node)+" ");
 				break;
-			case 32:
+			case NAND:
 				System.out.print("NAND"+all_nodes.indexOf(desired_node)+" ");
 				break;
-			case 33:
+			case NOR:
 				System.out.print("NOR"+all_nodes.indexOf(desired_node)+" ");
 				break;
-			case 34:
+			case XOR:
 				System.out.print("XOR"+all_nodes.indexOf(desired_node)+" ");
 				break;
-			case 35:
+			case XNOR:
 				System.out.print("XNOR"+all_nodes.indexOf(desired_node)+" ");
 				break;
 		}	
@@ -503,11 +503,11 @@ public class BooleanTree {
 		int loops = 0;
 		
 		// Choose random new gate
-		int new_gate = 30 + random_generator.nextInt(6);
+		int new_gate = AND + random_generator.nextInt(6);
 
 		// Choose a different gate type if it's the current gate type
 		while(mutated.gate_type == new_gate && loops < 5) {
-			new_gate = 30 + random_generator.nextInt(6);
+			new_gate = AND + random_generator.nextInt(6);
 			loops++;
 		}
 
@@ -585,7 +585,7 @@ public class BooleanTree {
 		//System.out.println("adding gate");
 	
 		Node child = selectNode(false); // Choose the child of the new node
-		Node new_node = new Node(30 + random_generator.nextInt(6),false); // Add a new gate
+		Node new_node = new Node(AND + random_generator.nextInt(6),false); // Add a new gate
 		
 		
 		// Choose parent nodes (currently cannot be inputs)
@@ -886,40 +886,40 @@ public class BooleanTree {
 		{
 			switch(curr.gate_type) // Print the desired node node
 			{
-				case 0: //X1
+				case X1: //X1
 					value = input_values[0];
 					break;
-				case 1: //X2
+				case X2: //X2
 					value = input_values[1];
 					break;
-				case 2: //X3
+				case X3: //X3
 					value = input_values[2];
 					break;
-				case 3: //X4
+				case X4: //X4
 					value = input_values[3];
 					break;
-				case 4: //X5
+				case X5: //X5
 					value = input_values[4];
 					break;
-				case 10: //X1'
+				case X1NOT: //X1'
 					value = !input_values[0];
 					break;
-				case 11: //X2'
+				case X2NOT: //X2'
 					value = !input_values[1];
 					break;
-				case 12: //X3'
+				case X3NOT: //X3'
 					value = !input_values[2];
 					break;
-				case 13: //X4'
+				case X4NOT: //X4'
 					value = !input_values[3];
 					break;
-				case 14: //X5'
+				case X5NOT: //X5'
 					value = !input_values[4];
 					break;
-				case 20: //Low
+				case LOW: //Low
 					value = false;
 					break;
-				case 21: //High
+				case HIGH: //High
 					value = true;
 					break;
 			}
@@ -929,21 +929,21 @@ public class BooleanTree {
 			int num_true;
 			switch(curr.gate_type) // Print the desired node node
 			{
-				case 30: // AND
+				case AND: // AND
 					value = true;
 					for (int i =0; i < (curr.parents).size(); i++)
 					{
 						value = value && evaluateNetwork(input_values, (curr.parents).get(i));
 					}
 					break;
-				case 31: // OR
+				case OR: // OR
 					value = false;
 					for (int i =0; i < (curr.parents).size(); i++)
 					{
 						value = value || evaluateNetwork(input_values, (curr.parents).get(i));
 					}
 					break;
-				case 32: //NAND
+				case NAND: //NAND
 					value = true;
 					for (int i =0; i < (curr.parents).size(); i++)
 					{
@@ -951,7 +951,7 @@ public class BooleanTree {
 					}
 					value = !value;
 					break;
-				case 33: // NOR
+				case NOR: // NOR
 					value = false;
 					for (int i =0; i < (curr.parents).size(); i++)
 					{
@@ -959,7 +959,7 @@ public class BooleanTree {
 					}
 					value = !value;
 					break;
-				case 34:
+				case XOR:
 					num_true  = 0;
 					for (int i =0; i < (curr.parents).size(); i++)
 					{
@@ -977,7 +977,7 @@ public class BooleanTree {
 						value = false;
 					}
 					break;
-				case 35: // XNOR
+				case XNOR: // XNOR
 					num_true  = 0;
 					for (int i =0; i < (curr.parents).size(); i++)
 					{
@@ -1052,58 +1052,58 @@ public class BooleanTree {
 		String gate_type="";
 		
 		switch(n.gate_type) { 
-			case 0:
+			case X1:
 				gate_type = "X1"; 
 				break;
-			case 1:
+			case X2:
 				gate_type = "X2"; 
 				break;
-			case 2:
+			case X3:
 				gate_type = "X3";
 				break;
-			case 3:
+			case X4:
 				gate_type = "X4"; 
 				break;
-			case 4:
+			case X5:
 				gate_type = "X5"; 
 				break;
-			case 10:
+			case X1NOT:
 				gate_type = "X1'";
 				break;
-			case 11:
+			case X2NOT:
 				gate_type = "X2'"; 
 				break;
-			case 12:
+			case X3NOT:
 				gate_type = "X3'"; 
 				break;
-			case 13:
+			case X4NOT:
 				gate_type = "X4'"; 
 				break;
-			case 14:
+			case X5NOT:
 				gate_type = "X5'";
 				break;
-			case 20:
+			case LOW:
 				gate_type = "0";
 				break;
-			case 21:
+			case HIGH:
 				gate_type = "1";
 				break;
-			case 30:
+			case AND:
 				gate_type = "AND"+all_nodes.indexOf(n);
 				break;
-			case 31:
+			case OR:
 				gate_type = "OR"+all_nodes.indexOf(n);
 				break;
-			case 32:
+			case NAND:
 				gate_type = "NAND"+all_nodes.indexOf(n);
 				break;
-			case 33:
+			case NOR:
 				gate_type = "NOR"+all_nodes.indexOf(n);
 				break;
-			case 34:
+			case XOR:
 				gate_type = "XOR"+all_nodes.indexOf(n);
 				break;
-			case 35:
+			case XNOR:
 				gate_type = "XNOR"+all_nodes.indexOf(n);
 				break;
 		}	
