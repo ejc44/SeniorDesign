@@ -256,7 +256,7 @@ public class BooleanTree {
 			new_children.clear();
 		}
 	
-	}*/
+	}
 	
 	
 	private void print_gate(Node desired_node)
@@ -318,6 +318,68 @@ public class BooleanTree {
 				System.out.print("XNOR"+all_nodes.indexOf(desired_node)+" ");
 				break;
 		}	
+	}
+	
+	*/
+	
+	
+	public String tree_string()
+	{
+		String s = "";
+		
+		ArrayList<Node> level_parents = new ArrayList<Node>();
+		
+		Node curr_node = all_nodes.get(0); // Extract root
+				
+		if((curr_node.parents).size() > 0) // If root has parent 
+		{
+			s = s + gate_string(curr_node)+" "; // Print the root node
+			s = s + ": ";
+			
+			for (int j=0; j< (curr_node.parents).size(); j++) // Print all of its parents
+			{
+				Node par_node = (curr_node.parents).get(j);
+				s = s + gate_string(par_node)+" ";
+				if(level_parents.contains(par_node) == false)
+				{
+					level_parents.add(par_node); // Store its parents
+				}
+			}
+			s = s + '\n';
+		}
+				
+		while(level_parents.size() > 0) // While are parents
+		{
+			ArrayList<Node> new_parents = new ArrayList<Node>();
+			
+			for (int i =0; i < level_parents.size(); i++)
+			{
+				curr_node = level_parents.get(i);
+				
+				if ((curr_node.parents).size() > 0)
+				{
+					s = s + gate_string(curr_node)+" "; // Print the input node
+					s = s + ": ";
+				
+				for (int j=0; j< (curr_node.parents).size(); j++) // Print all of its parents
+				{
+					Node par_node = (curr_node.parents).get(j);
+					s = s + gate_string(par_node)+" ";
+					if(new_parents.contains(par_node) == false)
+					{
+						new_parents.add(par_node); // Store its parents
+					}
+				}
+				s = s + '\n';				
+				}
+			}
+			
+			level_parents.clear();
+			level_parents = new ArrayList<Node>(new_parents);
+			new_parents.clear();
+		}
+	
+		return s;
 	}
 	
 	
@@ -938,16 +1000,6 @@ public class BooleanTree {
 		
 		return value;
 	}
-
-
-
-
-
-
-
-
-
-
 
 
 	public String printNetwork() {

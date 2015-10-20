@@ -34,6 +34,10 @@ public class optimalMain {
 		int cost = network.getCost();
 		System.out.println(cost);
 
+		System.out.println();
+		s = network.tree_string();
+		System.out.println(s);
+		
 		/*network.mutate();
 		System.out.println("Test");
 		s = network.printNetwork();
