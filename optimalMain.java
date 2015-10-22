@@ -11,15 +11,25 @@ public class optimalMain {
 		int[] table = getTableFromFile(numVars,lines);
 		int index = calcIndex(table);
 
-		String indexFilename = "/"+numVars+"var/"+index+".txt";
+		String basePath = new File("").getAbsolutePath();
+		String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
 		int[][] sumOfProducts;
 		int sopTerms;
 		BooleanTree network;
 
+		int cost;
+
 		try {
 			BufferedReader buff = new BufferedReader(new FileReader(indexFilename));
-			network = null;
+			
+			ArrayList<String> linesFromFile = readDatabaseFile(buff);
+			buff.close();
+
+			cost = Integer.parseInt(linesFromFile.get(0));
+			linesFromFile.remove(0);
+
+			network = new BooleanTree(numVars, table, linesFromFile);
 		} catch (IOException e) {
 			System.out.println("File does not exist. Creating SOP.\n");
 
@@ -29,38 +39,50 @@ public class optimalMain {
 			network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
 		}
 
+
 		String s = network.printNetwork();
 		System.out.println(s);
-		int cost = network.getCost();
+		cost = network.getCost();
 		System.out.println(cost);
 
 		System.out.println();
 		s = network.tree_string();
 		System.out.println(s);
-		
-		/*network.mutate();
-		System.out.println("Test");
-		s = network.printNetwork();
-		System.out.println(s);*/
-		
-		/*
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(indexFilename));
 
-		oos.writeObject(network);
-		oos.flush();
-		oos.close();
-		*/
+		s = network.fileOutput();
+		System.out.println(s);
 
-		// for(int i=0;i<5;i++) {
-		// 	network.mutate();
+		for(int i=0;i<5;i++) {
+			network.mutate();
+			System.out.println(network.fileOutput());
+			table = network.getTruthTable();
 
-		// 	cost = network.getCost();
+			index = calcIndex(table);
+			indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
-		// 	s = network.printNetwork();
-		// 	System.out.println(s);
-		// 	System.out.println(cost);
+			try {
+				BufferedReader buff2 = new BufferedReader(new FileReader(indexFilename));
 
-		// }
+				ArrayList<String> linesFromFile = readDatabaseFile(buff2);
+				buff2.close();
+
+				cost = Integer.parseInt(linesFromFile.get(0));
+
+				if(cost > network.getCost()) {
+					FileWriter writer = new FileWriter(new File(indexFilename));
+					writer.write(Integer.toString(network.getCost()) + "\n");
+					writer.write(network.fileOutput());
+					writer.flush();
+					writer.close();
+				}
+			} catch (IOException e) {
+				FileWriter writer = new FileWriter(new File(indexFilename));
+				writer.write(Integer.toString(network.getCost()) + "\n");
+				writer.write(network.fileOutput());
+				writer.flush();
+				writer.close();
+			}
+		}
 	}
 
 
@@ -86,6 +108,21 @@ public class optimalMain {
 			System.out.println("Error with buffer");
 		}
 
+		return lines;
+	}
+
+	public static ArrayList<String> readDatabaseFile(BufferedReader buff) {
+		ArrayList<String> lines = new ArrayList<String>();
+		String line;
+
+		try {
+			// Read in the files into lines arraylist
+			while((line=buff.readLine()) != null) {
+				lines.add(line);
+			}
+		} catch (IOException e) {
+			System.out.println("Error with buffer");
+		}
 		return lines;
 	}
 

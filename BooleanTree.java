@@ -140,6 +140,100 @@ public class BooleanTree {
 		//System.out.println("The num nodes is " + all_nodes.size());
 		//System.out.println("The cost is " + cost);
 	}
+
+
+
+	public BooleanTree(int numVars, int[] table, ArrayList<String> lines) {
+		random_generator = new Random(System.currentTimeMillis()); // Seed random number generator
+		all_nodes = new ArrayList<Node>();
+		
+		num_inputs = numVars;
+		truth_table = table.clone(); // Copy the truth table into the tree
+
+		ArrayList<String> gates = new ArrayList<String>();
+
+		// Create all the nodes
+		for(int i=0;i<lines.size();i++) {
+			// Split the lines into child & parent
+			String[] hold = (lines.get(i)).split(":");
+			String child = hold[0];
+
+			// Add the string version of child to the gates arraylist
+			gates.add(child);
+
+			// Using the string, find the integer gate value
+			int gate = findGateType(child);
+
+			// Root node will be the first line of the file
+			Boolean root = false;
+			if(i==0) {root=true;};
+
+			// Create the node
+			Node n = new Node(gate,root);
+
+			// Add node to all_nodes
+			all_nodes.add(n);
+		}
+
+		// Connect the child and parent nodes		
+		for(int i=0;i<lines.size();i++) {
+			// Split line into child and parents
+			String [] hold = (lines.get(i)).split(":");
+			// Check if there are any parents
+			if(hold.length>1) {
+				String parents = hold[1];
+
+				// Find the child node
+				Node childNode = all_nodes.get(i);
+
+				// Split up the parents into separate strings
+				String[] parent = parents.split(" ");
+
+				// For every parent string, find it's index, and then it's node, then connect the child and parent
+				for(int j=0;j<parent.length;j++) {
+					int parentNodeIndex = gates.indexOf(parent[j]);
+					Node parentNode = all_nodes.get(parentNodeIndex);
+
+					connectNodes(parentNode,childNode);
+				}
+			}
+		}
+
+		// Check if low input node exists
+		Boolean found = false;
+		for(int i=0;i<all_nodes.size();i++) {
+			Node n = all_nodes.get(i);
+
+			if(n.gate_type==LOW) {
+				found=true;
+				break;
+			}
+		}
+		// Add low input if it doesn't already exist
+		if(found==false) {
+			Node n = new Node(LOW,false);
+		}
+
+
+		// Check if high input node exists
+		found=false;
+		for(int i=0;i<all_nodes.size();i++) {
+			Node n = all_nodes.get(i);
+
+			if(n.gate_type==HIGH) {
+				found=true;
+				break;
+			}
+		}
+		// Add high input if it doesn't already exist
+		if(found==false) {
+			Node n = new Node(HIGH,false);
+		}
+
+		calcCost();
+	}
+
+
 	
 	// Connect two nodes
 	private void connectNodes(Node parent, Node child)
@@ -196,6 +290,47 @@ public class BooleanTree {
 	public int getCost()
 	{
 		return cost;
+	}
+
+
+	public String fileOutput() {
+		String s = print_tree();
+		return s;
+	}
+
+	private String print_tree() {
+		String s = "";
+		String hold;
+		
+		// Get root node & it's index
+		Node n = findRoot();
+		int rootIndex = all_nodes.indexOf(n);
+		
+		// Add root gate to string
+
+		s += gate_string(n)+":";
+		
+		// Add parents of root to string
+		for(int i=0;i<(n.parents).size();i++) {
+			s += gate_string((n.parents).get(i))+" ";
+		}
+		s += "\n";
+		
+		// Loop through all the nodes, and output child:parents
+		for(int i=0;i<all_nodes.size();i++) {
+			if(i!=rootIndex) {	// Check if the index values is the same as the root. We don't want it to output twice
+				// Print child node
+				s += gate_string(all_nodes.get(i))+":";
+				
+				// Print parents
+				for(int j=0;j<((all_nodes.get(i)).parents).size();j++) {
+					s += gate_string(((all_nodes.get(i)).parents).get(j)) + " ";
+				}
+				s += "\n";
+			}
+		}
+		
+		return s;
 	}
 	
 	/*
@@ -1111,6 +1246,89 @@ public class BooleanTree {
 		return gate_type;
 	
 	
+	}
+
+	private int findGateType(String gate) {
+		int gateType=-1;
+
+		String gateMod = removeNum(gate);
+
+		switch(gateMod) {
+			case "X1":
+				gateType=0;
+			break;
+			case "X2":
+				gateType=1;
+			break;
+			case "X3":
+				gateType=2;
+			break;
+			case "X4":
+				gateType=3;
+			break;
+			case "X5":
+				gateType=4;
+			break;
+			case "X1'":
+				gateType=10;
+			break;
+			case "X2'":
+				gateType=11;
+			break;
+			case "X3'":
+				gateType=12;
+			break;
+			case "X4'":
+				gateType=13;
+			break;
+			case "X5'":
+				gateType=14;
+			break;
+			case "0":
+				gateType=20;
+			break;
+			case "1":
+				gateType=21;
+			break;
+			case "AND":
+				gateType=30;
+			break;
+			case "OR":
+				gateType=31;
+			break;
+			case "NAND":
+				gateType=32;
+			break;
+			case "NOR":
+				gateType=33;
+			break;
+			case "XOR":
+				gateType=34;
+			break;
+			case "XNOR":
+				gateType=35;
+			break;
+		}
+
+		return gateType;
+	}
+
+	private String removeNum(String gate) {
+		if(gate.charAt(0) == '0' || gate.charAt(0) == '1') {
+			return gate;
+		} else if (gate.charAt(0) == 'X' && gate.length() > 3) {
+			String sub = gate.replaceAll("[^A-Z]","");
+			return sub;
+		} else if (gate.charAt(0) == 'X' && gate.length() <= 3) {
+			return gate;
+		} else {
+			String sub = gate.replaceAll("[^A-Z]","");
+			return sub;
+		}
+	}
+
+	public int[] getTruthTable() {
+		return truth_table;
 	}
 
 }
