@@ -162,7 +162,7 @@ public class BooleanTree {
 			gates.add(child);
 
 			// Using the string, find the integer gate value
-			int gate = findGateType(child);
+			int gate = stringToGate(child);
 
 			// Root node will be the first line of the file
 			Boolean root = false;
@@ -308,11 +308,11 @@ public class BooleanTree {
 		
 		// Add root gate to string
 
-		s += gate_string(n)+":";
+		s += gateToString(n)+":";
 		
 		// Add parents of root to string
 		for(int i=0;i<(n.parents).size();i++) {
-			s += gate_string((n.parents).get(i))+" ";
+			s += gateToString((n.parents).get(i))+" ";
 		}
 		s += "\n";
 		
@@ -320,11 +320,11 @@ public class BooleanTree {
 		for(int i=0;i<all_nodes.size();i++) {
 			if(i!=rootIndex) {	// Check if the index values is the same as the root. We don't want it to output twice
 				// Print child node
-				s += gate_string(all_nodes.get(i))+":";
+				s += gateToString(all_nodes.get(i))+":";
 				
 				// Print parents
 				for(int j=0;j<((all_nodes.get(i)).parents).size();j++) {
-					s += gate_string(((all_nodes.get(i)).parents).get(j)) + " ";
+					s += gateToString(((all_nodes.get(i)).parents).get(j)) + " ";
 				}
 				s += "\n";
 			}
@@ -332,131 +332,6 @@ public class BooleanTree {
 		
 		return s;
 	}
-	
-	/*
-	public void print_tree()
-	{
-		int num_input_nodes = num_inputs*2+2;
-	
-		ArrayList<Node> level_children = new ArrayList<Node>();
-		
-		System.out.println("\nParent : Children\n");
-		
-		for (int i = 0; i< num_input_nodes; i++)
-		{
-			if(((all_nodes.get(i+1)).children).size() > 0) // If input has a child
-			{
-				print_gate(all_nodes.get(i+1)); // Print the input node
-				System.out.print(": ");
-				
-				for (int j=0; j< ((all_nodes.get(i+1)).children).size(); j++) // Print all of its children
-				{
-					print_gate(((all_nodes.get(i+1)).children).get(j));
-					if(level_children.contains(((all_nodes.get(i+1)).children).get(j)) == false)
-					{
-						level_children.add(((all_nodes.get(i+1)).children).get(j)); // Store its children
-					}
-				}
-				System.out.println();
-			}
-		}
-		
-		
-		while(level_children.size() > 0) // While are children
-		{
-			ArrayList<Node> new_children = new ArrayList<Node>();
-			
-			for (int i =0; i < level_children.size(); i++)
-			{
-				if (((level_children.get(i)).children).size() > 0)
-				{
-					print_gate((level_children.get(i))); // Print the input node
-					System.out.print(": ");
-				
-				for (int j=0; j< ((level_children.get(i)).children).size(); j++) // Print all of its children
-				{
-					print_gate(((level_children.get(i)).children).get(j));
-					if(new_children.contains(((level_children.get(i)).children).get(j)) == false)
-					{
-						new_children.add(((level_children.get(i)).children).get(j)); // Store its children
-					}
-				}
-				System.out.println();
-				
-				}
-			}
-			
-			level_children.clear();
-			level_children = new ArrayList<Node>(new_children);
-			new_children.clear();
-		}
-	
-	}
-	
-	
-	private void print_gate(Node desired_node)
-	{
-		switch(desired_node.gate_type) // Print the desired node node
-		{
-			case X1:
-				System.out.print("X1 "); 
-				break;
-			case X2:
-				System.out.print("X2 "); 
-				break;
-			case X3:
-				System.out.print("X3 ");
-				break;
-			case X4:
-				System.out.print("X4 "); 
-				break;
-			case X5:
-				System.out.print("X5 "); 
-				break;
-			case X1NOT:
-				System.out.print("X1' ");
-				break;
-			case X2NOT:
-				System.out.print("X2' "); 
-				break;
-			case X3NOT:
-				System.out.print("X3' "); 
-				break;
-			case X4NOT:
-				System.out.print("X4' "); 
-				break;
-			case X5NOT:
-				System.out.print("X5' ");
-				break;
-			case LOW:
-				System.out.print("0 ");
-				break;
-			case HIGH:
-				System.out.print("1 ");
-				break;
-			case AND:
-				System.out.print("AND"+all_nodes.indexOf(desired_node)+" ");
-				break;
-			case OR:
-				System.out.print("OR"+all_nodes.indexOf(desired_node)+" ");
-				break;
-			case NAND:
-				System.out.print("NAND"+all_nodes.indexOf(desired_node)+" ");
-				break;
-			case NOR:
-				System.out.print("NOR"+all_nodes.indexOf(desired_node)+" ");
-				break;
-			case XOR:
-				System.out.print("XOR"+all_nodes.indexOf(desired_node)+" ");
-				break;
-			case XNOR:
-				System.out.print("XNOR"+all_nodes.indexOf(desired_node)+" ");
-				break;
-		}	
-	}
-	
-	*/
-	
 	
 	public String tree_string()
 	{
@@ -468,13 +343,13 @@ public class BooleanTree {
 				
 		if((curr_node.parents).size() > 0) // If root has parent 
 		{
-			s = s + gate_string(curr_node)+" "; // Print the root node
+			s = s + gateToString(curr_node)+" "; // Print the root node
 			s = s + ": ";
 			
 			for (int j=0; j< (curr_node.parents).size(); j++) // Print all of its parents
 			{
 				Node par_node = (curr_node.parents).get(j);
-				s = s + gate_string(par_node)+" ";
+				s = s + gateToString(par_node)+" ";
 				if(level_parents.contains(par_node) == false)
 				{
 					level_parents.add(par_node); // Store its parents
@@ -493,13 +368,13 @@ public class BooleanTree {
 				
 				if ((curr_node.parents).size() > 0)
 				{
-					s = s + gate_string(curr_node)+" "; // Print the input node
+					s = s + gateToString(curr_node)+" "; // Print the input node
 					s = s + ": ";
 				
 				for (int j=0; j< (curr_node.parents).size(); j++) // Print all of its parents
 				{
 					Node par_node = (curr_node.parents).get(j);
-					s = s + gate_string(par_node)+" ";
+					s = s + gateToString(par_node)+" ";
 					if(new_parents.contains(par_node) == false)
 					{
 						new_parents.add(par_node); // Store its parents
@@ -1160,7 +1035,7 @@ public class BooleanTree {
 		for(int i=0;i<level;i++) {
 			s = s+"\t";
 		}
-		s = s+gate_string(child);
+		s = s+gateToString(child);
 		
 		if(child.is_input == false) {
 			s = s+"(\n";
@@ -1183,7 +1058,7 @@ public class BooleanTree {
 		return s;
 	}
 
-	private String gate_string(Node n) {
+	private String gateToString(Node n) {
 		String gate_type="";
 		
 		switch(n.gate_type) { 
@@ -1244,69 +1119,67 @@ public class BooleanTree {
 		}	
 		
 		return gate_type;
-	
-	
 	}
 
-	private int findGateType(String gate) {
+	private int stringToGate(String gate) {
 		int gateType=-1;
 
 		String gateMod = removeNum(gate);
 
 		switch(gateMod) {
 			case "X1":
-				gateType=0;
+				gateType=X1;
 			break;
 			case "X2":
-				gateType=1;
+				gateType=X2;
 			break;
 			case "X3":
-				gateType=2;
+				gateType=X3;
 			break;
 			case "X4":
-				gateType=3;
+				gateType=X4;
 			break;
 			case "X5":
-				gateType=4;
+				gateType=X5;
 			break;
 			case "X1'":
-				gateType=10;
+				gateType=X1NOT;
 			break;
 			case "X2'":
-				gateType=11;
+				gateType=X2NOT;
 			break;
 			case "X3'":
-				gateType=12;
+				gateType=X3NOT;
 			break;
 			case "X4'":
-				gateType=13;
+				gateType=X4NOT;
 			break;
 			case "X5'":
-				gateType=14;
+				gateType=X5NOT;
 			break;
 			case "0":
-				gateType=20;
+				gateType=LOW;
 			break;
 			case "1":
-				gateType=21;
+				gateType=HIGH;
 			break;
 			case "AND":
-				gateType=30;
+				gateType=AND;
 			break;
 			case "OR":
-				gateType=31;
+				gateType=OR;
 			break;
 			case "NAND":
-				gateType=32;
+				gateType=NAND;
 			break;
 			case "NOR":
-				gateType=33;
+				gateType=NOR;
 			break;
 			case "XOR":
-				gateType=34;
+				gateType=XOR;
 			break;
 			case "XNOR":
-				gateType=35;
+				gateType=XNOR;
 			break;
 		}
 

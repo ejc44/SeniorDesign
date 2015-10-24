@@ -9,7 +9,7 @@ public class optimalMain {
 
 		String[] lines = readUserTableFile(numVars, truthTableFilename);
 		int[] table = getTableFromFile(numVars,lines);
-		int index = calcIndex(table);
+		long index = calcIndex(table);
 
 		String basePath = new File("").getAbsolutePath();
 		String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
@@ -181,8 +181,8 @@ public class optimalMain {
 		return sopTerms;
 	}
 
-	public static int calcIndex(int[] table) {
-		int index = 0;
+	public static long calcIndex(int[] table) {
+		long index = 0;
 		for(int i=0;i<table.length;i++) {
 			index += table[i] * (int) (Math.pow(2,i));
 		}
