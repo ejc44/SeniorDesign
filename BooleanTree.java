@@ -47,6 +47,7 @@ public class BooleanTree {
 		private ArrayList<Node> parents; // Node array of the parents
 		private ArrayList<Node> children; // Node array of its children
 		//private int[] truth_value; // Truth table value up to that point	
+		private int node_level; // Number of levels between inputs and node (node_level = 0 for inputs)
 		
 		// Constructor
 		private Node(int gt, boolean ir)
@@ -55,6 +56,8 @@ public class BooleanTree {
 			children = new ArrayList<Node>();
 			gate_type = gt;
 			is_root = ir;
+			node_level = -1; // Invalid value by default
+			
 			if (gate_type < AND)
 			{
 				is_input = true;
@@ -132,6 +135,7 @@ public class BooleanTree {
 			connectNodes(and_node,root); // Connect to root
 		}
 		
+		calcNodeLevels();
 		
 		calcCost(); // Get the cost of the new tree
 		
@@ -230,27 +234,81 @@ public class BooleanTree {
 			Node n = new Node(HIGH,false);
 		}
 
+		calcNodeLevels();
+		
 		calcCost();
 	}
 
+	// Find the node levels for all nodes in the network
+	private void calcNodeLevels()
+	{
+		int curr_level = 0;
+		
+		ArrayList<Node> level_children = new ArrayList<Node>();
+		
+		for(int i =0; i < all_nodes.size(); i++) // Initialize node_level and find input nodes
+		{
+			Node curr = all_nodes.get(i);
+			curr.node_level = 0;// Set all levels to zero by default
+			if (curr.is_input) // Collect all input nodes
+			{
+				level_children.add(curr);
+			}
+		}
+			
+		while(level_children.size() > 0) // While are children
+		{
+			ArrayList<Node> new_children = new ArrayList<Node>();
+			
+			for (int i =0; i < level_children.size(); i++) // For every node in level_children
+			{
+				Node curr_node = level_children.get(i);
+				
+				for (int j=0; j< (curr_node.children).size(); j++) //Increment level of all of its children
+				{
+					Node child_node = (curr_node.children).get(j);
+					if(new_children.contains(child_node) == false) // Hasn't already been added and incremented
+					{
+						new_children.add(child_node); // Store its parents
+						child_node.node_level += 1; // Increment its level
+					}
+				}				
+			}
+		
+			level_children.clear();
+			level_children = new ArrayList<Node>(new_children);
+			new_children.clear();
+		}
+	}
+	
 
 	
 	// Connect two nodes
 	private void connectNodes(Node parent, Node child)
 	{
 		//System.out.println("Connect nodes");
-		
-		(parent.children).add(child); // Add the child to the parent's children list
-		(child.parents).add(parent); // Add the parent to the child's children list
+		if (!(parent.children).contains(child)) // If not already in list
+		{
+			(parent.children).add(child); // Add the child to the parent's children list
+		}
+		if (!(child.parents).contains(parent)) // If not already in list
+		{
+			(child.parents).add(parent); // Add the parent to the child's children list
+		}
 	}
 
 	// Disconnect two nodes
 	private void disconnectNodes(Node parent, Node child) 
 	{
 		//System.out.println("Disconnect nodes");
-		
-		(child.parents).remove(parent);	// Remove the parent from the child's parents list
-		(parent.children).remove(child);	// Remove the child from the parent's children list 
+		while ((child.parents).contains(parent)) // Remove all instances
+		{
+			(child.parents).remove(parent);	// Remove the parent from the child's parents list
+		}
+		while ((parent.children).contains(child)) // Remove all instances
+		{
+			(parent.children).remove(child);	// Remove the child from the parent's children list 
+		}
 	}
 	
 	
@@ -396,8 +454,6 @@ public class BooleanTree {
 	// Tells tree to mutate
 	public void mutate()
 	{
-		//System.out.println("Mutating");
-		
 		boolean mutate_success = false;
 		
 		while (mutate_success != true)
@@ -406,11 +462,11 @@ public class BooleanTree {
 			//System.out.println(p);
 			// Choose type of mutation
 			// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
-			if (p < 0.2)
+			if (p < 0.1)
 			{
 				mutate_success = deleteInput();
 			}
-			else if (p < 0.4)
+			else if (p < 0.3)
 			{
 				mutate_success = addInput();
 			}
@@ -418,7 +474,7 @@ public class BooleanTree {
 			{
 				mutate_success = changeType();
 			}
-			else if (p < 0.6)
+			else if (p < 0.7)
 			{
 				mutate_success = deleteGate();
 			}
@@ -440,8 +496,6 @@ public class BooleanTree {
 	// Delete an input from the network
 	private boolean deleteInput()
 	{
-		//System.out.println("Deleting input");
-		
 		Node child = selectNode(false); // Choose the child
 		int loops = 0;
 		
@@ -463,6 +517,9 @@ public class BooleanTree {
 		// Remove connection
 		disconnectNodes(input,child);
 
+		// Update node levels
+		calcNodeLevels();
+		
 		// Recalculate cost;
 		calcCost();
 		
@@ -475,8 +532,6 @@ public class BooleanTree {
 	// Add an input to the network
 	private boolean addInput()
 	{
-		//System.out.println("Adding input");
-		
 		Node child = selectNode(false); // Choose the child
 		Node input = selectNode(true);	// Choose the input
 		int loops = 0;
@@ -495,6 +550,9 @@ public class BooleanTree {
 		// Connect input
 		connectNodes(input,child);
 
+		// Update node levels
+		calcNodeLevels();
+		
 		// Recalculate cost;
 		calcCost();
 		
@@ -507,8 +565,6 @@ public class BooleanTree {
 	// Change the gate type of a node
 	private boolean changeType()
 	{
-		//System.out.println("Changing type");
-	
 		Node mutated = selectNode(false); // Choose the node to change
 		int loops = 0;
 		
@@ -529,6 +585,9 @@ public class BooleanTree {
 		// Change the gate type
 		mutated.gate_type = new_gate;
 		
+		// Update node levels - should not change anything
+		calcNodeLevels();
+		
 		// Recalculate cost - currently unnecessary, but could change with different gate types
 		calcCost();
 		
@@ -540,9 +599,7 @@ public class BooleanTree {
 	
 	// Remove a gate
 	private boolean deleteGate()
-	{
-		//System.out.println("Deleting gate");
-	
+	{	
 		Node removed = selectNode(false); // Choose the node to remove
 		int loops = 0;
 	
@@ -556,7 +613,6 @@ public class BooleanTree {
 		{
 			return false;
 		}
-		//System.out.println("Deleting gate2");
 	
 		// Connect all of the parents of 'removed' to all of the children of 'removed'
 		for(int i=0;i<(removed.parents).size();i++) {
@@ -564,21 +620,29 @@ public class BooleanTree {
 				connectNodes((removed.parents).get(i),(removed.children).get(j));
 			}
 		}
-
-		// From 'removed's parents, remove the connection to 'removed'
-		for(int i=0;i<(removed.parents).size();i++) {
-			Node par = (removed.parents).get(i);
+		
+		// From removed's parents, remove the connection to 'removed'
+		while(!(removed.parents).isEmpty()) 
+		{
+			Node par = (removed.parents).get(0);
 			disconnectNodes(par, removed);
 		}
 
-		// From 'removed's children, remove the connection to 'removed'
-		for(int i=0;i<(removed.children).size();i++) {
-			Node child = (removed.children).get(i);
+		// From removed's children, remove the connection to 'removed'
+		while(!(removed.children).isEmpty()) 
+		{
+			Node child = (removed.children).get(0);
 			disconnectNodes(removed, child);
 		}
 
 		// Remove the gate's node completely
-		all_nodes.remove(removed);		
+		while (all_nodes.contains(removed)) // Remove all instances
+		{
+			all_nodes.remove(removed);		
+		}
+		
+		// Update node levels
+		calcNodeLevels();
 		
 		// Recalculate cost
 		calcCost();
@@ -592,8 +656,6 @@ public class BooleanTree {
 	// Add a gate
 	private boolean addGate()
 	{
-		//System.out.println("adding gate");
-	
 		Node child = selectNode(false); // Choose the child of the new node
 		Node new_node = new Node(AND + random_generator.nextInt(6),false); // Add a new gate
 		
@@ -619,6 +681,9 @@ public class BooleanTree {
 		connectNodes(parent1, new_node);
 		connectNodes(new_node, child);
 		
+		// Update node levels
+		calcNodeLevels();
+		
 		// Now check for cyclic-ness of other parent
 		boolean cyclic2 = isCyclic(parent2, child);
 		int loop2 = 0;
@@ -633,13 +698,21 @@ public class BooleanTree {
 		{
 			disconnectNodes(parent1,new_node);
 			disconnectNodes(new_node,child);
-			all_nodes.remove(new_node);
+			while (all_nodes.contains(new_node)) // Remove all instances
+			{
+				all_nodes.remove(new_node);
+			}
+			// Update node levels
+			calcNodeLevels();
 			return false;
 		}
 		else
 		{		
 			connectNodes(parent2, new_node);
 		}
+		
+		// Update node levels
+		calcNodeLevels();		
 		
 		// Recalculate cost
 		calcCost();
@@ -674,6 +747,9 @@ public class BooleanTree {
 		}
 		
 		connectNodes(newPar,child);
+		
+		// Update node levels
+		calcNodeLevels();
 		
 		// Recalculate cost
 		calcCost();
@@ -753,6 +829,9 @@ public class BooleanTree {
 			}
 		}
 		
+		// Update node levels -- unnecessary
+		//calcNodeLevels();
+		
 		// Recalculate cost -- unnecessary
 		//calcCost();
 		
@@ -787,7 +866,7 @@ public class BooleanTree {
 	{
 		//System.out.println("Starting iscyclic");
 		
-		ArrayList<Node> descendants = new ArrayList<Node>(); // All of child's descendants
+		/*ArrayList<Node> descendants = new ArrayList<Node>(); // All of child's descendants
 		
 		for (int i = 0; i < (child.children).size(); i++)
 		{
@@ -838,7 +917,16 @@ public class BooleanTree {
 			new_children.clear();
 		}
 		//System.out.println("cyclic 4");
-		return false;
+		return false;*/
+		
+		if (par.node_level < child.node_level) // Cyclic-ness depends on node level only
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	private void updateTable()
