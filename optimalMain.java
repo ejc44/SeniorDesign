@@ -8,58 +8,71 @@ public class optimalMain {
 		String truthTableFilename = args[1];
 
 		String[] lines = readUserTableFile(numVars, truthTableFilename);
-		int[] table = getTableFromFile(numVars,lines);
-		long index = calcIndex(table);
 
-		String basePath = new File("").getAbsolutePath();
-		String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+		if(lines.length != ((int) (Math.pow(2,numVars))) ) {
+			System.out.println("Error with user input:\nNumber of variables does not match up with the number of truth table values");
+		} else {
+			int[] table = getTableFromFile(numVars,lines);
+			long index = calcIndex(table);
 
-		int[][] sumOfProducts;
-		int sopTerms;
-		BooleanTree network;
+			String basePath = new File("").getAbsolutePath();
+			String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
-		int cost;
+			int[][] sumOfProducts;
+			int sopTerms;
+			BooleanTree network;
 
-		try {
-			BufferedReader buff = new BufferedReader(new FileReader(indexFilename));
-			
-			ArrayList<String> linesFromFile = readDatabaseFile(buff);
-			buff.close();
+			int cost;
 
-			cost = Integer.parseInt(linesFromFile.get(0));
-			linesFromFile.remove(0);
+			try {
+				BufferedReader buff = new BufferedReader(new FileReader(indexFilename));
+				
+				ArrayList<String> linesFromFile = readDatabaseFile(buff);
+				buff.close();
 
-			network = new BooleanTree(numVars, table, linesFromFile);
-		} catch (IOException e) {
-			System.out.println("File does not exist. Creating SOP.\n");
+				cost = Integer.parseInt(linesFromFile.get(0));
+				linesFromFile.remove(0);
 
-			sumOfProducts = getSumOfProducts(numVars,table);
-			sopTerms = getSOPTerms(table);
-	
-			network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
-		}
+				int sopCost = calcSOPCost(numVars, table);
+
+				// Check if the network in the file has a cost less than or equal to the SOP cost
+				// If so, use that network
+				// If not, use SOP network
+				if(cost<=sopCost) {
+					network = new BooleanTree(numVars, table, linesFromFile);
+				} else {
+					sumOfProducts = getSumOfProducts(numVars,table);
+					sopTerms = getSOPTerms(table);
+		
+					network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
+				}
+			} catch (IOException e) {
+				System.out.println("File does not exist. Creating SOP.\n");
+
+				sumOfProducts = getSumOfProducts(numVars,table);
+				sopTerms = getSOPTerms(table);
+		
+				network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
+			}
+
+			// Output Network
+			String s = network.printNetwork();
+			System.out.println(s);
+			cost = network.getCost();
+			System.out.println(cost);
 
 
-		String s = network.printNetwork();
-		System.out.println(s);
-		cost = network.getCost();
-		System.out.println(cost);
-
-		System.out.println();
-		s = network.tree_string();
-		System.out.println(s);
-
-		s = network.fileOutput();
-		System.out.println(s);
-
-		for(int i=0;i<5;i++) {
+			// Mutate the network		
 			network.mutate();
-			System.out.println(network.fileOutput());
-			table = network.getTruthTable();
 
+			System.out.println(network.printNetwork());
+
+			// Get new truth table, calculate new index, create new filename
+			table = network.getTruthTable();
 			index = calcIndex(table);
 			indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
+			// Check if file already exists
 			try {
 				BufferedReader buff2 = new BufferedReader(new FileReader(indexFilename));
 
@@ -68,6 +81,7 @@ public class optimalMain {
 
 				cost = Integer.parseInt(linesFromFile.get(0));
 
+				// If the cost of the new network is less than the database network write the new network to the file
 				if(cost > network.getCost()) {
 					FileWriter writer = new FileWriter(new File(indexFilename));
 					writer.write(Integer.toString(network.getCost()) + "\n");
@@ -76,6 +90,7 @@ public class optimalMain {
 					writer.close();
 				}
 			} catch (IOException e) {
+				// Write the network to the file
 				FileWriter writer = new FileWriter(new File(indexFilename));
 				writer.write(Integer.toString(network.getCost()) + "\n");
 				writer.write(network.fileOutput());
@@ -94,21 +109,22 @@ public class optimalMain {
 
 
 	public static String[] readUserTableFile(int numVars, String filename) {
-		String[] lines = new String[(int) (Math.pow(2,numVars))];
+		ArrayList<String> lines = new ArrayList<String>();
+		int i=0;
 		try {
 			BufferedReader buff = new BufferedReader(new FileReader(filename));
 			String line;
-			int i=0;
 
 			while((line=buff.readLine()) != null) {
-				lines[i] = line;
+				lines.add(line);
 				i++;
 			}
 		} catch (IOException e) {
 			System.out.println("Error with buffer");
 		}
+		String[] linesArr = new String[i];
 
-		return lines;
+		return lines.toArray(linesArr);
 	}
 
 	public static ArrayList<String> readDatabaseFile(BufferedReader buff) {
@@ -188,6 +204,21 @@ public class optimalMain {
 		}
 
 		return index;
+	}
+
+	public static int calcSOPCost(int numVars, int[] table) {
+		int cost = 0;
+		int andGates = 0;
+		for(int i=0;i<table.length;i++) {
+			if(table[i]==1) {
+				cost += numVars + 1;
+				andGates++;
+			}
+		}
+
+		cost += andGates + 1;
+
+		return cost;
 	}
 
 	public static int chooseTable(int numVars) {
