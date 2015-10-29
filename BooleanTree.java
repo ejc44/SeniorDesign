@@ -464,30 +464,37 @@ public class BooleanTree {
 			// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
 			if (p < 0.1)
 			{
+				//System.out.println("Delete Intput");
 				mutate_success = deleteInput();
 			}
 			else if (p < 0.3)
 			{
+				//System.out.println("Add Input");
 				mutate_success = addInput();
 			}
 			else if (p < 0.5)
 			{
+				//System.out.println("Change Type");
 				mutate_success = changeType();
 			}
 			else if (p < 0.7)
 			{
+				//System.out.println("Delete Gate");
 				mutate_success = deleteGate();
 			}
 			else if (p < 0.8)
 			{
+				//System.out.println("Add Gate");
 				mutate_success = addGate();
 			}
 			else if (p < 0.9)
 			{
+				//System.out.println("Add Connection");
 				mutate_success = addConnection();
 			}
 			else
 			{
+				//System.out.println("Reassign Inputs");
 				mutate_success = reassignInputs();
 			}	
 		}	
@@ -604,7 +611,7 @@ public class BooleanTree {
 		int loops = 0;
 	
 		// Find a new node if the random node is the root
-		while(removed.is_root==true || loops<5) {
+		while(removed.is_root==true && loops<5) {
 			removed = selectNode(false);
 			loops++;
 		}
@@ -846,6 +853,7 @@ public class BooleanTree {
 	private Node selectNode(boolean isInput)
 	{
 		int s = all_nodes.size();
+		int loops=0;
 
 		// Select a random node
 		int rand = random_generator.nextInt(s);
@@ -853,9 +861,13 @@ public class BooleanTree {
 
 		// Check if the random node matches the given isInput value
 		// If it doesn't match, find a new node
-		while(selected.is_input != isInput) {
+		while(selected.is_input != isInput && loops<5) {
 			rand = random_generator.nextInt(s);
 			selected = all_nodes.get(rand);
+			loops++;
+		}
+		if(loops>=5) {
+			return findRoot();
 		}
 
 		return selected;
