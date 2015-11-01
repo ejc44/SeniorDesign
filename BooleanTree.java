@@ -454,9 +454,10 @@ public class BooleanTree {
 	// Tells tree to mutate
 	public void mutate()
 	{
-		boolean mutate_success = false;
+		boolean mutate_success = false; // Whether mutation succeeded
+		int attempts = 0; // Number of mutation attempts - so doesn't get stuck if only root node exists
 		
-		while (mutate_success != true)
+		while (mutate_success != true && attempts<100)
 		{
 			double p = random_generator.nextDouble(); // Generate a probability
 			//System.out.println(p);
@@ -496,7 +497,8 @@ public class BooleanTree {
 			{
 				//System.out.println("Reassign Inputs");
 				mutate_success = reassignInputs();
-			}	
+			}
+			attempts++;
 		}	
 	}
 	
