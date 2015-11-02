@@ -100,14 +100,14 @@ public class optimalMain {
 
 						linesFromFile.remove(0);
 
-						network = new BooleanTree(numVars, table, linesFromFile);
+						network = new BooleanTree(numVars, linesFromFile);
 					}
 
 					// Output Network to user
 					String s = network.printNetwork();
 					System.out.println(s);
 					cost = network.getCost();
-					System.out.println(cost);
+					System.out.println("Cost: "+cost);
 
 					// Write file to db
 					boolean success = writeDBFile(network,indexFilename);
@@ -204,7 +204,7 @@ public class optimalMain {
 						int indexListVal = chooseIndex(fiveVarIndexes.size());
 						index = fiveVarIndexes.get(indexListVal);
 					}
-					int[] table = getTableFromIndex(numVars,index);
+					//int[] table = getTableFromIndex(numVars,index);
 
 					String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
@@ -226,16 +226,22 @@ public class optimalMain {
 					// Create network
 					ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
 					linesFromFile.remove(0);
-					BooleanTree network = new BooleanTree(numVars,table,linesFromFile);
-
+					BooleanTree network = new BooleanTree(numVars,linesFromFile);
+					
+					//System.out.println(network.printNetwork()); // Print before mutating
+					cost = network.getCost();
+					//System.out.println(network.getCost()); // Print cost
+					//System.out.println(Arrays.toString(network.getTruthTable()));
+					
 					// Mutate network 100 times
 					for(int j=0;j<100;j++) {
 						network.mutate();
 
 						// Output Network
-						//System.out.println(network.printNetwork());
+						/*System.out.println(network.printNetwork()); // Print after mutating
 						cost = network.getCost();
-						//System.out.println(network.getCost());
+						System.out.println(network.getCost()); // Print cost
+						System.out.println(Arrays.toString(network.getTruthTable()));*/
 
 						int sopCost = calcSOPCost(numVars, network.getTruthTable());
 
@@ -520,7 +526,7 @@ public class optimalMain {
 
 	Return: integer array representing a truth table
 	********************/
-	public static int[] getTableFromIndex(int numVars, long index) {
+	/*public static int[] getTableFromIndex(int numVars, long index) {
 		int[] table = new int[(int) (Math.pow(2,numVars))];
 		String s = Long.toBinaryString(index);
 		for(int i=0;i<s.length();i++) {
@@ -528,7 +534,7 @@ public class optimalMain {
 		}
 
 		return table;
-	}
+	}*/ // No longer necessary and seems to have a bug
 
 	/********************
 	Create a list of all the index values in the DB
