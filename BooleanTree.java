@@ -1,5 +1,5 @@
 /*
-	Booleen Tree file
+	Boolean Tree file
 	Can generate a canonical SOP network
 	
 */
@@ -271,6 +271,7 @@ public class BooleanTree {
 				for (int j=0; j< (curr_node.children).size(); j++) //Increment level of all of its children
 				{
 					Node child_node = (curr_node.children).get(j);
+					
 					if(new_children.contains(child_node) == false) // Hasn't already been added and incremented
 					{
 						new_children.add(child_node); // Store its parents
@@ -278,7 +279,7 @@ public class BooleanTree {
 					}
 				}				
 			}
-		
+			
 			level_children.clear();
 			level_children = new ArrayList<Node>(new_children);
 			new_children.clear();
@@ -564,12 +565,12 @@ public class BooleanTree {
 			input = selectNode(true);
 			loops++;
 		}
-		
+
 		if ((child.parents).contains(input)) // If still connected
 		{
 			return false;
 		}
-
+		
 		// Connect input
 		connectNodes(input,child);
 
@@ -578,10 +579,10 @@ public class BooleanTree {
 		
 		// Update node levels
 		calcNodeLevels();
-		
+	
 		// Update the truth table
 		updateTable();
-		
+	
 		return true;
 	}
 	
@@ -905,7 +906,6 @@ public class BooleanTree {
 	private Node selectNode(boolean isInput)
 	{
 		int s = all_nodes.size();
-		int loops=0;
 
 		// Select a random node
 		int rand = random_generator.nextInt(s);
@@ -913,13 +913,9 @@ public class BooleanTree {
 
 		// Check if the random node matches the given isInput value
 		// If it doesn't match, find a new node
-		while(selected.is_input != isInput && loops<5) {
+		while(selected.is_input != isInput) {
 			rand = random_generator.nextInt(s);
 			selected = all_nodes.get(rand);
-			loops++;
-		}
-		if(loops>=5) {
-			return findRoot();
 		}
 
 		return selected;
