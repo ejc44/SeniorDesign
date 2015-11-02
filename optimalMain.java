@@ -112,7 +112,7 @@ public class optimalMain {
 					// Write file to db
 					boolean success = writeDBFile(network,indexFilename);
 					if(success) {
-						System.out.println("Network written to database");
+						//System.out.println("Network written to database");
 
 						// Add the truth table to list of things in db
 						if(numVars==3) {
@@ -155,7 +155,7 @@ public class optimalMain {
 								// Write to DB
 								success = writeDBFile(network, indexFilename);
 								if(success) {
-									System.out.println("Network written to database");
+									//System.out.println("Network written to database");
 
 									// Add the truth table to list of things in db
 									if(numVars==3) {
@@ -254,7 +254,7 @@ public class optimalMain {
 							if(network.getCost() < cost || cost == -1) {
 								boolean success = writeDBFile(network, indexFilename);
 								if(success) {
-									System.out.println("Network written to database");
+									//System.out.println("Network written to database");
 
 									if(numVars==3) {
 										if(!threeVarIndexes.contains(index)) {
