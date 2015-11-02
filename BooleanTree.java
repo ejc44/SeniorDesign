@@ -476,32 +476,32 @@ public class BooleanTree {
 			//System.out.println(p);
 			// Choose type of mutation
 			// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
-			if (p < 0)
+			if (p < 0.1)
 			{
 				//System.out.println("Delete Intput");
 				mutate_success = deleteInput();
 			}
-			else if (p < 0)
+			else if (p < 0.3)
 			{
 				//System.out.println("Add Input");
 				mutate_success = addInput();
 			}
-			else if (p < 0)
+			else if (p < 0.5)
 			{
 				//System.out.println("Change Type");
 				mutate_success = changeType();
 			}
-			else if (p < 0)
+			else if (p < 0.7)
 			{
 				//System.out.println("Delete Gate");
 				mutate_success = deleteGate();
 			}
-			else if (p < 0)
+			else if (p < 0.8)
 			{
 				//System.out.println("Add Gate");
 				mutate_success = addGate();
 			}
-			else if (p < 0)
+			else if (p < 0.9)
 			{
 				//System.out.println("Add Connection");
 				mutate_success = addConnection();
