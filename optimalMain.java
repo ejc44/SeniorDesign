@@ -17,14 +17,6 @@ public class optimalMain {
 		List<Long> fiveVarIndexes = new ArrayList<>();
 		fiveVarIndexes = getDBIndexes(5);
 
-		// List of indexes
-		long[] threeVarCosts = new long[10];
-		threeVarCosts = getDBCosts(3);
-		long[] fourVarCosts = new long[10];
-		fourVarCosts = getDBCosts(4);
-		long[] fiveVarCosts = new long[10];
-		fiveVarCosts = getDBCosts(5);
-
 		do {
 			// Ask user what they would like to do
 			System.out.println("");
@@ -201,20 +193,14 @@ public class optimalMain {
 				// Choose 5 different networks to mutate 100 times each
 				for(int i=0;i<5;i++) {
 					// Select a network to mutate
-					int indexListVal = chooseIndex(10);
 					long index;
 					if(numVars==3) {
-						index = threeVarCosts[indexListVal];
+						int indexListVal = chooseIndex(threeVarIndexes.size());
+						index = threeVarIndexes.get(indexListVal);
 					} else if(numVars==4) {
-						index = fourVarCosts[indexListVal];
+						int indexListVal = chooseIndex(fourVarIndexes.size());
+						index = fourVarIndexes.get(indexListVal);
 					} else {
-<<<<<<< HEAD
-						index = fiveVarCosts[indexListVal];
-					}
-
-					if(index!=0) {
-						int[] table = getTableFromIndex(numVars,index);
-=======
 						int indexListVal = chooseIndex(fiveVarIndexes.size());
 						index = fiveVarIndexes.get(indexListVal);
 					}
@@ -256,71 +242,36 @@ public class optimalMain {
 						cost = network.getCost();
 						System.out.println(network.getCost()); // Print cost
 						System.out.println(Arrays.toString(network.getTruthTable()));*/
->>>>>>> 5cecdf867c36cf8c163cba98842071c3be6e3e69
 
-						String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+						int sopCost = calcSOPCost(numVars, network.getTruthTable());
 
-						int cost = getIndexCost(indexFilename);
-						int loops = 0;
-						while(cost == -1 && loops<=10) {
-							index = chooseIndex(numVars);
+						if(network.getCost() < sopCost) {
+							index = calcIndex(network.getTruthTable());
 							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+
 							cost = getIndexCost(indexFilename);
-							loops++;
-						}
 
-						if(loops>=5) {
-							break;
-						}
+							if(network.getCost() < cost || cost == -1) {
+								boolean success = writeDBFile(network, indexFilename);
+								if(success) {
+									System.out.println("Network written to database");
 
-						// Read in DB file
-						// Remove cost from file inputs
-						// Create network
-						ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
-						linesFromFile.remove(0);
-						BooleanTree network = new BooleanTree(numVars,table,linesFromFile);
-
-						// Mutate network 100 times
-						for(int j=0;j<100;j++) {
-							network.mutate();
-
-							// Output Network
-							//System.out.println(network.printNetwork());
-							cost = network.getCost();
-							//System.out.println(network.getCost());
-
-							int sopCost = calcSOPCost(numVars, network.getTruthTable());
-
-							if(network.getCost() < sopCost) {
-								index = calcIndex(network.getTruthTable());
-								indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
-
-								cost = getIndexCost(indexFilename);
-
-								if(network.getCost() < cost || cost == -1) {
-									boolean success = writeDBFile(network, indexFilename);
-									if(success) {
-										System.out.println("Network written to database");
-
-										if(numVars==3) {
-											if(!threeVarIndexes.contains(index)) {
-												threeVarIndexes.add(index);
-											}
-										} else if(numVars == 4) {
-											if(!fourVarIndexes.contains(index)) {
-												fourVarIndexes.add(index);
-											}
-										} else {
-											if(!fiveVarIndexes.contains(index)) {
-												fiveVarIndexes.add(index);
-											}
+									if(numVars==3) {
+										if(!threeVarIndexes.contains(index)) {
+											threeVarIndexes.add(index);
+										}
+									} else if(numVars == 4) {
+										if(!fourVarIndexes.contains(index)) {
+											fourVarIndexes.add(index);
+										}
+									} else {
+										if(!fiveVarIndexes.contains(index)) {
+											fiveVarIndexes.add(index);
 										}
 									}
 								}
 							}
 						}
-					} else {
-						System.out.println("No cost file. Please run the program with a truth table.");
 					}
 				}
 			}
@@ -331,11 +282,6 @@ public class optimalMain {
 		saveDBIndexes(3, threeVarIndexes);
 		saveDBIndexes(4, fourVarIndexes);
 		saveDBIndexes(5, fiveVarIndexes);
-
-		// Save highest and lowest indexes
-		saveCostFile(3, threeVarIndexes);
-		saveCostFile(4, fourVarIndexes);
-		saveCostFile(5, fiveVarIndexes);
 	}
 
 
@@ -656,93 +602,4 @@ public class optimalMain {
 		}
 	}
 
-	/********************
-	Save the indexes which correspond to the 5 lowest costs and 5 highest costs
-	to a file in the DB
-
-	int numVars: number of input variables corresponding to the truth table
-	List<Long> indexes: list of indexes in db
-	********************/
-	public static void saveCostFile(int numVars, List<Long> indexes) {
-		String basepath = new File("").getAbsolutePath();
-		String dbFilePath = basepath+"\\"+numVars+"var\\costs.txt";
-
-		long[][] costs = new long[indexes.size()][2];
-		int[] costArr = new int[indexes.size()];
-
-		List<Long> organized = new ArrayList<>();
-
-		for(int i=0;i<indexes.size();i++) {
-			costs[i][0] = indexes.get(i);
-
-			String indexFilename = basepath+"\\"+numVars+"var\\"+indexes.get(i)+".txt";
-			costs[i][1] = getIndexCost(indexFilename);
-			costArr[i] = getIndexCost(indexFilename);
-		}
-
-		Arrays.sort(costArr);
-
-		for(int i=0;i<costArr.length;i++) {
-			for(int j=0;j<costArr.length;j++) {
-				if(costs[j][1] == costArr[i] && !organized.contains(costs[j][0])) {
-					organized.add(costs[j][0]);
-				}
-			}
-		}	
-
-		try {
-			FileWriter writer = new FileWriter(new File(dbFilePath));
-
-			for(int i=0;i<5;i++) {
-				writer.write(Long.toString(organized.get(i))+"\n");
-			}
-			for(int i=(organized.size()-1);i>(organized.size()-1-5);i--) {
-				writer.write(Long.toString(organized.get(i))+"\n");
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			System.out.println("Error saving cost file");
-		}
-	}
-
-	/********************
-	Creates an array containing the highest and lowest costs for the specified number of variables
-
-	int numVars: number of input variables corresponding to the truth table
-
-	return long[]: array of indexes
-	********************/
-	public static long[] getDBCosts(int numVars) {
-		long[] indexes = new long[10];
-
-		String basepath = new File("").getAbsolutePath();
-		String dbFilePath = basepath+"\\"+numVars+"var\\costs.txt";
-
-		File dbFile = new File(dbFilePath);
-
-		int i=0;
-
-		if(dbFile.exists() == true) {
-			try {
-				BufferedReader buff = new BufferedReader(new FileReader(dbFilePath));
-				String line;
-
-				while((line=buff.readLine())!= null) {
-					long hold = Long.valueOf(line).longValue();
-					indexes[i]=hold;
-
-					i++;
-				}
-			} catch (IOException e) {
-				System.out.println("Error reading DB index file");
-			}
-		} else {
-			for(int j=0;j<10;j++) {
-				indexes[j]=0;
-			}
-		}
-
-		return indexes;
-	}
 }
