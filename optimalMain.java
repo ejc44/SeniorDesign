@@ -108,14 +108,14 @@ public class optimalMain {
 
 						linesFromFile.remove(0);
 
-						network = new BooleanTree(numVars, table, linesFromFile);
+						network = new BooleanTree(numVars, linesFromFile);
 					}
 
 					// Output Network to user
 					String s = network.printNetwork();
 					System.out.println(s);
 					cost = network.getCost();
-					System.out.println(cost);
+					System.out.println("Cost: "+cost);
 
 					// Write file to db
 					boolean success = writeDBFile(network,indexFilename);
@@ -208,11 +208,55 @@ public class optimalMain {
 					} else if(numVars==4) {
 						index = fourVarCosts[indexListVal];
 					} else {
+<<<<<<< HEAD
 						index = fiveVarCosts[indexListVal];
 					}
 
 					if(index!=0) {
 						int[] table = getTableFromIndex(numVars,index);
+=======
+						int indexListVal = chooseIndex(fiveVarIndexes.size());
+						index = fiveVarIndexes.get(indexListVal);
+					}
+					//int[] table = getTableFromIndex(numVars,index);
+
+					String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+
+					int cost = getIndexCost(indexFilename);
+					int loops = 0;
+					while(cost == -1 && loops<=10) {
+						index = chooseIndex(numVars);
+						indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+						cost = getIndexCost(indexFilename);
+						loops++;
+					}
+
+					if(loops>=5) {
+						break;
+					}
+
+					// Read in DB file
+					// Remove cost from file inputs
+					// Create network
+					ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
+					linesFromFile.remove(0);
+					BooleanTree network = new BooleanTree(numVars,linesFromFile);
+					
+					//System.out.println(network.printNetwork()); // Print before mutating
+					cost = network.getCost();
+					//System.out.println(network.getCost()); // Print cost
+					//System.out.println(Arrays.toString(network.getTruthTable()));
+					
+					// Mutate network 100 times
+					for(int j=0;j<100;j++) {
+						network.mutate();
+
+						// Output Network
+						/*System.out.println(network.printNetwork()); // Print after mutating
+						cost = network.getCost();
+						System.out.println(network.getCost()); // Print cost
+						System.out.println(Arrays.toString(network.getTruthTable()));*/
+>>>>>>> 5cecdf867c36cf8c163cba98842071c3be6e3e69
 
 						String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
@@ -536,7 +580,7 @@ public class optimalMain {
 
 	Return: integer array representing a truth table
 	********************/
-	public static int[] getTableFromIndex(int numVars, long index) {
+	/*public static int[] getTableFromIndex(int numVars, long index) {
 		int[] table = new int[(int) (Math.pow(2,numVars))];
 		String s = Long.toBinaryString(index);
 		for(int i=0;i<s.length();i++) {
@@ -544,7 +588,7 @@ public class optimalMain {
 		}
 
 		return table;
-	}
+	}*/ // No longer necessary and seems to have a bug
 
 	/********************
 	Create a list of all the index values in the DB
