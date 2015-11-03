@@ -842,33 +842,49 @@ public class BooleanTree {
 			{
 				if (num_inputs == 5)
 				{
-					if((curr_node.gate_type < 4) || (curr_node.gate_type>=10 && curr_node.gate_type<=13) || curr_node.gate_type==20) {
+					if((curr_node.gate_type < 3) || (curr_node.gate_type < 13 && curr_node.gate_type > 4) || (curr_node.gate_type == 20))
+					{
 						curr_node.gate_type += 1;
-					} else if(curr_node.gate_type == 4 || curr_node.gate_type == 14) {
+					}
+					else if (curr_node.gate_type == 4 || curr_node.gate_type == 14)
+					{
 						curr_node.gate_type += 6;
-					} else {
+					}
+					else
+					{
 						curr_node.gate_type = 0;
 					}
 				}
 				else if (num_inputs == 4)
 				{
-					if((curr_node.gate_type < 3) || (curr_node.gate_type>=10 && curr_node.gate_type<=13) || (curr_node.gate_type==20)) {
+					if((curr_node.gate_type < 2) || (curr_node.gate_type < 12 && curr_node.gate_type > 3) || (curr_node.gate_type == 20))
+					{
 						curr_node.gate_type += 1;
-					} else if(curr_node.gate_type==3 || curr_node.gate_type==13) {
+					}
+					else if (curr_node.gate_type == 3 || curr_node.gate_type == 13)
+					{
 						curr_node.gate_type += 7;
-					} else {
+					}
+					else
+					{
 						curr_node.gate_type = 0;
 					}
 				}
 				else
 				{	
-					if((curr_node.gate_type < 2) || (curr_node.gate_type>=10 && curr_node.gate_type<=12) || (curr_node.gate_type==20)) {
+					if((curr_node.gate_type < 2) || (curr_node.gate_type < 12 && curr_node.gate_type > 3) || (curr_node.gate_type == 20))
+					{
 						curr_node.gate_type += 1;
-					} else if(curr_node.gate_type == 2 || curr_node.gate_type == 12) {
-						curr_node.gate_type += 8;
-					} else {
-						curr_node.gate_type=0;
 					}
+					else if (curr_node.gate_type == 2 || curr_node.gate_type == 12)
+					{
+						curr_node.gate_type += 8;
+					}
+					else
+					{
+						curr_node.gate_type = 0;
+					}
+					
 				}
 			}
 		}

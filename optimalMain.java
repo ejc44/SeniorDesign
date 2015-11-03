@@ -191,7 +191,7 @@ public class optimalMain {
 				int numVars = Integer.parseInt(u);
 
 				// Choose 5 different networks to mutate 100 times each
-				for(int i=0;i<20;i++) {
+				for(int i=0;i<5;i++) {
 					// Select a network to mutate
 					long index;
 					if(numVars==3) {
@@ -234,7 +234,7 @@ public class optimalMain {
 					//System.out.println(Arrays.toString(network.getTruthTable()));
 					
 					// Mutate network 100 times
-					for(int j=0;j<50;j++) {
+					for(int j=0;j<100;j++) {
 						network.mutate();
 
 						// Output Network
