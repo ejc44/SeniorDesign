@@ -9,6 +9,9 @@ public class optimalMain {
 
 		String basePath = new File("").getAbsolutePath();
 
+		// Check for db folders, create if needed
+		checkDB(basePath);
+
 		// Create lists of the indexes we already have in the DB
 		List<Long> threeVarIndexes = new ArrayList<>();
 		threeVarIndexes = getDBIndexes(3);
@@ -602,4 +605,48 @@ public class optimalMain {
 		}
 	}
 
+	/********************
+	Create 3var, 4var, and 5var folders if they don't exist
+	If those folders don't exist, also create blank indexes.txt files for each folder
+
+	String basePath: the current directory
+	********************/
+	public static void checkDB(String basePath) {
+		File d = new File(basePath+"\\3var");
+		if(!d.exists()) {
+			d.mkdir();
+
+			try {
+				File f = new File(basePath+"\\3var\\indexes.txt");
+				f.createNewFile();
+			} catch(IOException e) {
+				System.out.println("Error creating 3var index file");
+			}
+		}
+
+		d = new File(basePath+"\\4var");
+		if(!d.exists()) {
+			d.mkdir();
+
+			try {
+				File f = new File(basePath+"\\4var\\indexes.txt");
+				f.createNewFile();
+			} catch(IOException e) {
+				System.out.println("Error creating 4var index file");
+			}
+			
+		}
+
+		d = new File(basePath+"\\5var");
+		if(!d.exists()) {
+			d.mkdir();
+
+			try {
+				File f = new File(basePath+"\\5var\\indexes.txt");
+				f.createNewFile();
+			} catch(IOException e) {
+				System.out.println("Error creating 5var index file");
+			}
+		}
+	}
 }
