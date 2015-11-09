@@ -336,6 +336,7 @@ public class BooleanTree {
 					{
 						disconnectNodes((curr.parents).get(j), curr);
 					}
+					
 					all_nodes.remove(i);
 					removed = true;
 				}	
@@ -472,50 +473,99 @@ public class BooleanTree {
 		boolean mutate_success = false; // Whether mutation succeeded
 		int attempts = 0; // Number of mutation attempts - so doesn't get stuck if only root node exists
 		
-		while (mutate_success != true && attempts<100)
+		// Do not allow mutations if total cost 0 (just an input node) or if gets stuck (over 100 unsuccessful attempts)
+		while (mutate_success != true && attempts<100 && cost > 0)
 		{
 			double p = random_generator.nextDouble(); // Generate a probability
 			//System.out.println(p);
+			
 			// Choose type of mutation
-			// Currently have probabilities hard-coded, but will probably be replaced with some sort of array with a generating function
-			if (p < 0.1)
+			
+			int sop_cost = calcSOPCost(); // SOP Cost = maximum possible cost
+			
+			// Probabilities of each mutation
+			double delete_input_prob = cost; // More probable if high cost
+			double add_input_prob = sop_cost - cost; // More probable if low cost
+			double change_type_prob = sop_cost - cost; // More probable if low cost
+			double delete_gate_prob = cost; // More probable if high cost
+			double add_gate_prob = sop_cost - cost; // More probable if low cost
+			double add_connection_prob = sop_cost - cost; // More probable if low cost
+			double reassign_input_prob = sop_cost - cost; // More probable if low cost
+			double delete_root_prob = cost; // More porbable if high cost
+			
+			double total = delete_input_prob + add_input_prob + change_type_prob + delete_gate_prob + add_gate_prob + add_connection_prob + reassign_input_prob + delete_root_prob;
+			
+			delete_input_prob = delete_input_prob / total;
+			add_input_prob = add_input_prob / total;
+			change_type_prob = change_type_prob / total;
+			delete_gate_prob = delete_gate_prob / total;
+			add_gate_prob = add_gate_prob / total;
+			add_connection_prob = add_connection_prob / total;
+			reassign_input_prob = reassign_input_prob / total;
+			delete_root_prob = delete_root_prob / total;
+		
+			
+			if (p < delete_input_prob)
 			{
 				//System.out.println("Delete Intput");
 				mutate_success = deleteInput();
 			}
-			else if (p < 0.3)
+			else if (p < add_input_prob)
 			{
 				//System.out.println("Add Input");
 				mutate_success = addInput();
 			}
-			else if (p < 0.5)
+			else if (p < change_type_prob)
 			{
 				//System.out.println("Change Type");
 				mutate_success = changeType();
 			}
-			else if (p < 0.7)
+			else if (p < delete_gate_prob)
 			{
 				//System.out.println("Delete Gate");
 				mutate_success = deleteGate();
 			}
-			else if (p < 0.8)
+			else if (p < add_gate_prob)
 			{
 				//System.out.println("Add Gate");
 				mutate_success = addGate();
 			}
-			else if (p < 0.9)
+			else if (p < add_connection_prob)
 			{
 				//System.out.println("Add Connection");
 				mutate_success = addConnection();
 			}
-			else
+			else if (p < reassign_input_prob)
 			{
 				//System.out.println("Reassign Inputs");
 				mutate_success = reassignInputs();
 			}
+			else
+			{
+				//System.out.println("Delete root");
+				mutate_success = deleteRoot();
+			}
 			attempts++;
 		}	
 	}
+	
+	// Calculate the sum-of-products cost
+	private int calcSOPCost() 
+	{
+		int cost = 0;
+		int andGates = 0;
+		for(int i=0;i<truth_table.length;i++) {
+			if(truth_table[i]==1) {
+				cost += num_inputs + 1;
+				andGates++;
+			}
+		}
+ 
+		cost += andGates + 1;
+
+		return cost;
+	}
+	
 	
 	// Delete an input from the network
 	private boolean deleteInput()
@@ -885,6 +935,36 @@ public class BooleanTree {
 		return true;		
 	}
 	
+	
+	// Delete the root node and select a new root node
+	private boolean deleteRoot()
+	{
+		Node root = findRoot(); // Get the root node
+		
+		int p = random_generator.nextInt((root.parents).size()); // Select which of its parents will become new root
+		Node new_root = (root.parents).get(p);
+		new_root.is_root = true;
+		
+		// Disconnect the root from all its parents
+		int num_parents = (root.parents).size();
+		for (int i = 0; i < num_parents; i++)
+		{
+			disconnectNodes((root.parents).get(0), root);
+		}
+		
+		all_nodes.remove(root);
+				
+		// Recalculate cost
+		calcCost();
+		
+		// Update node levels
+		calcNodeLevels();
+		
+		// Update the truth table
+		updateTable();
+		
+		return true;
+	}
 	
 	// Selects Node to mutate
 	private Node selectNode(boolean isInput)
