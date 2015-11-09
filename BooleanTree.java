@@ -485,6 +485,10 @@ public class BooleanTree {
 			
 			// Probabilities of each mutation
 			double delete_input_prob = cost; // More probable if high cost
+			if(delete_input_prob < 0)
+			{
+				delete_input_prob = 0;
+			}
 			double add_input_prob = sop_cost - cost; // More probable if low cost
 			if(add_input_prob < 0)
 			{
@@ -496,6 +500,10 @@ public class BooleanTree {
 				change_type_prob = 0;
 			}
 			double delete_gate_prob = cost; // More probable if high cost
+			if(delete_gate_prob < 0)
+			{
+				delete_gate_prob = 0;
+			}
 			double add_gate_prob = sop_cost - cost; // More probable if low cost
 			if(add_gate_prob < 0)
 			{
@@ -512,6 +520,10 @@ public class BooleanTree {
 				reassign_input_prob = 0;
 			}
 			double delete_root_prob = cost; // More probable if high cost
+			if(delete_root_prob < 0)
+			{
+				delete_root_prob = 0;
+			}
 			
 			
 			double total = delete_input_prob + add_input_prob + change_type_prob + delete_gate_prob + add_gate_prob + add_connection_prob + reassign_input_prob + delete_root_prob;
