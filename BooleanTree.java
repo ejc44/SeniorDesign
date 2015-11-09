@@ -486,24 +486,45 @@ public class BooleanTree {
 			// Probabilities of each mutation
 			double delete_input_prob = cost; // More probable if high cost
 			double add_input_prob = sop_cost - cost; // More probable if low cost
+			if(add_input_prob < 0)
+			{
+				add_input_prob = 0;
+			}
 			double change_type_prob = sop_cost - cost; // More probable if low cost
+			if(change_type_prob < 0)
+			{
+				change_type_prob = 0;
+			}
 			double delete_gate_prob = cost; // More probable if high cost
 			double add_gate_prob = sop_cost - cost; // More probable if low cost
+			if(add_gate_prob < 0)
+			{
+				add_gate_prob = 0;
+			}
 			double add_connection_prob = sop_cost - cost; // More probable if low cost
+			if(add_connection_prob < 0)
+			{
+				add_connection_prob = 0;
+			}
 			double reassign_input_prob = sop_cost - cost; // More probable if low cost
-			double delete_root_prob = cost; // More porbable if high cost
+			if(reassign_input_prob < 0)
+			{
+				reassign_input_prob = 0;
+			}
+			double delete_root_prob = cost; // More probable if high cost
+			
 			
 			double total = delete_input_prob + add_input_prob + change_type_prob + delete_gate_prob + add_gate_prob + add_connection_prob + reassign_input_prob + delete_root_prob;
 			
 			delete_input_prob = delete_input_prob / total;
-			add_input_prob = add_input_prob / total;
-			change_type_prob = change_type_prob / total;
-			delete_gate_prob = delete_gate_prob / total;
-			add_gate_prob = add_gate_prob / total;
-			add_connection_prob = add_connection_prob / total;
-			reassign_input_prob = reassign_input_prob / total;
-			delete_root_prob = delete_root_prob / total;
-		
+			add_input_prob = add_input_prob / total + delete_input_prob;
+			change_type_prob = change_type_prob / total + add_input_prob;
+			delete_gate_prob = delete_gate_prob / total + change_type_prob;
+			add_gate_prob = add_gate_prob / total + delete_gate_prob;
+			add_connection_prob = add_connection_prob / total + add_gate_prob;
+			reassign_input_prob = reassign_input_prob / total + add_connection_prob;
+			delete_root_prob = delete_root_prob / total + reassign_input_prob;
+			
 			
 			if (p < delete_input_prob)
 			{
