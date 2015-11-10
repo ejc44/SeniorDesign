@@ -71,6 +71,7 @@ public class optimalMain {
 					int[][] sumOfProducts;
 					int sopTerms;
 					BooleanTree network;
+					ArrayList<String> linesFromFile;
 
 					int cost;
 
@@ -89,6 +90,10 @@ public class optimalMain {
 						network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
 
 						sopCreated = true;
+						linesFromFile=null;
+					} else if (cost==0) {
+						linesFromFile = readDatabaseFile(indexFilename);
+						network=null;
 					} else if (cost>sopCost) {	// Cost in DB is greater than SOP, Create SOP
 						System.out.println("Database network cost greater than SOP cost. Creating SOP\n");
 
@@ -98,8 +103,9 @@ public class optimalMain {
 						network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
 
 						sopCreated = true;
+						linesFromFile=null;
 					} else {	// Truth table exists in DB, read it in
-						ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
+						linesFromFile = readDatabaseFile(indexFilename);
 
 						linesFromFile.remove(0);
 
@@ -107,71 +113,79 @@ public class optimalMain {
 					}
 
 					// Output Network to user
-					String s = network.printNetwork();
-					System.out.println(s);
-					cost = network.getCost();
-					System.out.println("Cost: "+cost);
+					if(cost==0) {
+						String s = "\nf = ";
+						s += linesFromFile.get(1).charAt(0);
+						System.out.println(s);
 
-					// Write file to db
-					boolean success = writeDBFile(network,indexFilename);
-					if(success) {
-						//System.out.println("Network written to database");
+						System.out.println("Cost: "+linesFromFile.get(0));
+					} else {
+						String s = network.printNetwork();
+						System.out.println(s);
+						cost = network.getCost();
+						System.out.println("Cost: "+cost);
 
-						// Add the truth table to list of things in db
-						if(numVars==3) {
-							if(!threeVarIndexes.contains(index)) {
-								threeVarIndexes.add(index);
-							}
-						} else if(numVars == 4) {
-							if(!fourVarIndexes.contains(index)) {
-								fourVarIndexes.add(index);
-							}
-						} else {
-							if(!fiveVarIndexes.contains(index)) {
-								fiveVarIndexes.add(index);
+						// Write file to db
+						boolean success = writeDBFile(network,indexFilename);
+						if(success) {
+							//System.out.println("Network written to database");
+
+							// Add the truth table to list of things in db
+							if(numVars==3) {
+								if(!threeVarIndexes.contains(index)) {
+									threeVarIndexes.add(index);
+								}
+							} else if(numVars == 4) {
+								if(!fourVarIndexes.contains(index)) {
+									fourVarIndexes.add(index);
+								}
+							} else {
+								if(!fiveVarIndexes.contains(index)) {
+									fiveVarIndexes.add(index);
+								}
 							}
 						}
-					}
 
-					// Mutate the user entered truth table network 50 times
-					for(int i=0;i<50;i++) {
-						network.mutate();
+						// Mutate the user entered truth table network 50 times
+						for(int i=0;i<50;i++) {
+							network.mutate();
 
-						// Output Network
-						//s = network.printNetwork();
-						//System.out.println(s);
-						cost = network.getCost();
-						//System.out.println(cost);
+							// Output Network
+							//s = network.printNetwork();
+							//System.out.println(s);
+							cost = network.getCost();
+							//System.out.println(cost);
 
-						sopCost = calcSOPCost(numVars, network.getTruthTable());
+							sopCost = calcSOPCost(numVars, network.getTruthTable());
 
-						// Check if the cost is less than SOP
-						// Only save to DB if less than SOP
-						if(network.getCost() <= sopCost) {
-							index = calcIndex(network.getTruthTable());
-							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+							// Check if the cost is less than SOP
+							// Only save to DB if less than SOP
+							if(network.getCost() <= sopCost) {
+								index = calcIndex(network.getTruthTable());
+								indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
-							cost = getIndexCost(indexFilename);
+								cost = getIndexCost(indexFilename);
 
-							// See if the cost is less than the cost currently in db
-							if(network.getCost() < cost || cost == -1) {
-								// Write to DB
-								success = writeDBFile(network, indexFilename);
-								if(success) {
-									//System.out.println("Network written to database");
+								// See if the cost is less than the cost currently in db
+								if(network.getCost() < cost || cost == -1) {
+									// Write to DB
+									success = writeDBFile(network, indexFilename);
+									if(success) {
+										//System.out.println("Network written to database");
 
-									// Add the truth table to list of things in db
-									if(numVars==3) {
-										if(!threeVarIndexes.contains(index)) {
-											threeVarIndexes.add(index);
-										}
-									} else if(numVars == 4) {
-										if(!fourVarIndexes.contains(index)) {
-											fourVarIndexes.add(index);
-										}
-									} else {
-										if(!fiveVarIndexes.contains(index)) {
-											fiveVarIndexes.add(index);
+										// Add the truth table to list of things in db
+										if(numVars==3) {
+											if(!threeVarIndexes.contains(index)) {
+												threeVarIndexes.add(index);
+											}
+										} else if(numVars == 4) {
+											if(!fourVarIndexes.contains(index)) {
+												fourVarIndexes.add(index);
+											}
+										} else {
+											if(!fiveVarIndexes.contains(index)) {
+												fiveVarIndexes.add(index);
+											}
 										}
 									}
 								}
