@@ -564,9 +564,14 @@ public class optimalMain {
 
 	Return: random integer between 0 and possible
 	********************/
-	public static int chooseIndex(int possible) {
+	public static long chooseIndex(long possible) {
 		Random randGen = new Random(System.currentTimeMillis());
-		int index = randGen.nextInt(possible);
+		long index;
+		if((int) possible > 0 ) {
+			index = (long) randGen.nextInt((int) possible);
+		} else {
+			index = (long)(randGen.nextDouble()*possible);
+		}
 
 		return index;
 	}
@@ -605,15 +610,21 @@ public class optimalMain {
 
 	Return: integer array representing a truth table
 	********************/
-	/*public static int[] getTableFromIndex(int numVars, long index) {
+	public static int[] getTableFromIndex(int numVars, long index) {
 		int[] table = new int[(int) (Math.pow(2,numVars))];
 		String s = Long.toBinaryString(index);
+		if(s.length() != (int) Math.pow(2,numVars)) {
+			int diff = (int) Math.pow(2,numVars) - s.length();
+			for(int i=0;i<diff;i++) {
+				s = "0"+s;
+			}
+		}
 		for(int i=0;i<s.length();i++) {
 			table[i] = Character.getNumericValue(s.charAt(i));
 		}
 
 		return table;
-	}*/ // No longer necessary and seems to have a bug
+	} // No longer necessary and seems to have a bug
 
 	/********************
 	Create a list of all the index values in the DB
