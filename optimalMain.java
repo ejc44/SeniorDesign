@@ -195,42 +195,118 @@ public class optimalMain {
 
 				// Choose 5 different networks to mutate 100 times each
 				for(int i=0;i<100;i++) {
-					// Select a network to mutate
 					long index;
-					if(numVars==3) {
-						int indexListVal = chooseIndex(threeVarIndexes.size());
-						index = threeVarIndexes.get(indexListVal);
-					} else if(numVars==4) {
-						int indexListVal = chooseIndex(fourVarIndexes.size());
-						index = fourVarIndexes.get(indexListVal);
-					} else {
-						int indexListVal = chooseIndex(fiveVarIndexes.size());
-						index = fiveVarIndexes.get(indexListVal);
-					}
-					//int[] table = getTableFromIndex(numVars,index);
+					String indexFilename;
+					int cost;
+					BooleanTree network;
 
-					String indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+					if(i==0) {
+						index = chooseIndex((long) Math.pow(2,Math.pow(2,numVars)));
 
-					int cost = getIndexCost(indexFilename);
-					int loops = 0;
-					while(cost == -1 && loops<=10) {
-						index = chooseIndex(numVars);
 						indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+
 						cost = getIndexCost(indexFilename);
-						loops++;
-					}
+						int loops = 0;
+						if(cost>=0 && loops<=100 && index<(long) Math.pow(2,Math.pow(2,numVars))) {
+							index++;
+							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+							cost = getIndexCost(indexFilename);
+							loops++;
+						}
 
-					if(loops>=5) {
-						break;
-					}
+						if(cost>=0) {
+							if(numVars==3) {
+								long indexListVal = chooseIndex((long) threeVarIndexes.size());
+								index = threeVarIndexes.get((int) indexListVal);
+							} else if(numVars==4) {
+								long indexListVal = chooseIndex((long) fourVarIndexes.size());
+								index = fourVarIndexes.get((int) indexListVal);
+							} else {
+								long indexListVal = chooseIndex((long) fiveVarIndexes.size());
+								index = fiveVarIndexes.get((int) indexListVal);
+							}
+							//int[] table = getTableFromIndex(numVars,index);
 
-					// Read in DB file
-					// Remove cost from file inputs
-					// Create network
-					ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
-					linesFromFile.remove(0);
-					BooleanTree network = new BooleanTree(numVars,linesFromFile);
+							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+
+							cost = getIndexCost(indexFilename);
+							int l = 0;
+							while(cost == -1 && l<=10) {
+								index = chooseIndex(numVars);
+								indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+								cost = getIndexCost(indexFilename);
+								l++;
+							}
+
+							if(l>=5) {
+								break;
+							}
+
+							ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
+							linesFromFile.remove(0);
+							network = new BooleanTree(numVars,linesFromFile);
+						} else {
+							int[] table = getTableFromIndex(numVars,index);
+							int[][] sumOfProducts = getSumOfProducts(numVars,table);
+							int sopTerms = getSOPTerms(table);
+
+							network = new BooleanTree(numVars, table, sumOfProducts, sopTerms);
+
+							// Write file to db
+							boolean success = writeDBFile(network,indexFilename);
+							if(success) {
+								//System.out.println("Network written to database");
+
+								// Add the truth table to list of things in db
+								if(numVars==3) {
+									if(!threeVarIndexes.contains(index)) {
+										threeVarIndexes.add(index);
+									}
+								} else if(numVars == 4) {
+									if(!fourVarIndexes.contains(index)) {
+										fourVarIndexes.add(index);
+									}
+								} else {
+									if(!fiveVarIndexes.contains(index)) {
+										fiveVarIndexes.add(index);
+									}
+								}
+							}
+						}
+					} else {
+						if(numVars==3) {
+							long indexListVal = chooseIndex((long) threeVarIndexes.size());
+							index = threeVarIndexes.get((int) indexListVal);
+						} else if(numVars==4) {
+							long indexListVal = chooseIndex((long) fourVarIndexes.size());
+							index = fourVarIndexes.get((int) indexListVal);
+						} else {
+							long indexListVal = chooseIndex((long) fiveVarIndexes.size());
+							index = fiveVarIndexes.get((int) indexListVal);
+						}
+						//int[] table = getTableFromIndex(numVars,index);
+
+						indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+
+						cost = getIndexCost(indexFilename);
+						int loops = 0;
+						while(cost == -1 && loops<=10) {
+							index = chooseIndex(numVars);
+							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
+							cost = getIndexCost(indexFilename);
+							loops++;
+						}
+
+						if(loops>=5) {
+							break;
+						}
+
+						ArrayList<String> linesFromFile = readDatabaseFile(indexFilename);
+						linesFromFile.remove(0);
+						network = new BooleanTree(numVars,linesFromFile);
+					}
 					
+					//System.out.println(index);
 					//System.out.println(network.printNetwork()); // Print before mutating
 					cost = network.getCost();
 					//System.out.println(network.getCost()); // Print cost
