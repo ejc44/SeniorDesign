@@ -147,7 +147,7 @@ public class optimalMain {
 
 						// Check if the cost is less than SOP
 						// Only save to DB if less than SOP
-						if(network.getCost() < sopCost) {
+						if(network.getCost() <= sopCost) {
 							index = calcIndex(network.getTruthTable());
 							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
@@ -194,7 +194,7 @@ public class optimalMain {
 				int numVars = Integer.parseInt(u);
 
 				// Choose 5 different networks to mutate 100 times each
-				for(int i=0;i<20;i++) {
+				for(int i=0;i<100;i++) {
 					// Select a network to mutate
 					long index;
 					if(numVars==3) {
@@ -248,7 +248,7 @@ public class optimalMain {
 
 						int sopCost = calcSOPCost(numVars, network.getTruthTable());
 
-						if(network.getCost() < sopCost) {
+						if(network.getCost() <= sopCost) {
 							index = calcIndex(network.getTruthTable());
 							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 

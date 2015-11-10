@@ -989,30 +989,36 @@ public class BooleanTree {
 	private boolean deleteRoot()
 	{
 		Node root = findRoot(); // Get the root node
-		
-		int p = random_generator.nextInt((root.parents).size()); // Select which of its parents will become new root
-		Node new_root = (root.parents).get(p);
-		new_root.is_root = true;
-		
-		// Disconnect the root from all its parents
-		int num_parents = (root.parents).size();
-		for (int i = 0; i < num_parents; i++)
-		{
-			disconnectNodes((root.parents).get(0), root);
+
+		int parSize = (root.parents).size();
+		if(parSize>0) {
+			int p = random_generator.nextInt(parSize);
+
+			Node new_root = (root.parents).get(p);
+			new_root.is_root = true;
+			
+			// Disconnect the root from all its parents
+			int num_parents = (root.parents).size();
+			for (int i = 0; i < num_parents; i++)
+			{
+				disconnectNodes((root.parents).get(0), root);
+			}
+			
+			all_nodes.remove(root);
+					
+			// Recalculate cost
+			calcCost();
+			
+			// Update node levels
+			calcNodeLevels();
+			
+			// Update the truth table
+			updateTable();
+
+			return true;
+		} else {
+			return false;
 		}
-		
-		all_nodes.remove(root);
-				
-		// Recalculate cost
-		calcCost();
-		
-		// Update node levels
-		calcNodeLevels();
-		
-		// Update the truth table
-		updateTable();
-		
-		return true;
 	}
 	
 	// Selects Node to mutate
