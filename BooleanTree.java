@@ -376,7 +376,7 @@ public class BooleanTree {
 		String s = "";
 		String hold;
 		
-		// Get root node & it's index
+		// Get root node & its index
 		Node n = findRoot();
 		int rootIndex = all_nodes.indexOf(n);
 		
@@ -389,6 +389,11 @@ public class BooleanTree {
 			s += gateToString((n.parents).get(i))+" ";
 		}
 		s += "\n";
+		
+		if (cost == 0) // Only print input node if cost 0
+		{
+			return s;
+		}
 		
 		// Loop through all the nodes, and output child:parents
 		for(int i=0;i<all_nodes.size();i++) {
@@ -478,6 +483,8 @@ public class BooleanTree {
 		{
 			double p = random_generator.nextDouble(); // Generate a probability
 			//System.out.println(p);
+			
+			//System.out.println("mutation attempt");
 			
 			// Choose type of mutation
 			
@@ -1004,7 +1011,12 @@ public class BooleanTree {
 				disconnectNodes((root.parents).get(0), root);
 			}
 			
-			all_nodes.remove(root);
+			boolean contains = true;
+			
+			while (contains)
+			{
+				contains = all_nodes.remove(root);
+			}
 					
 			// Recalculate cost
 			calcCost();
@@ -1139,7 +1151,7 @@ public class BooleanTree {
 				}
 			}			
 			
-			boolean value = evaluateNetwork(input_values, all_nodes.get(0)); // New truth table value for given entry
+			boolean value = evaluateNetwork(input_values, findRoot()); // New truth table value for given entry
 			if (value)
 			{
 				truth_table[index] = 1;
