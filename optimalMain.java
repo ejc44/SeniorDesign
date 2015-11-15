@@ -115,7 +115,9 @@ public class optimalMain {
 					// Output Network to user
 					if(cost==0) {
 						String s = "\nf = ";
-						s += linesFromFile.get(1).charAt(0);
+						for (int i=0;i<linesFromFile.get(1).length()-1;i++) {
+							s += linesFromFile.get(1).charAt(i);
+						}
 						System.out.println(s);
 
 						System.out.println("Cost: "+linesFromFile.get(0));
