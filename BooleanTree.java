@@ -491,22 +491,22 @@ public class BooleanTree {
 			int sop_cost = calcSOPCost(); // SOP Cost = maximum possible cost
 			
 			// Probabilities of each mutation
-			double delete_input_prob = cost; // More probable if high cost
+			double delete_input_prob = 3*cost; // More probable if high cost
 			if(delete_input_prob < 0)
 			{
 				delete_input_prob = 0;
 			}
-			double add_input_prob = sop_cost - cost; // More probable if low cost
+			double add_input_prob = 2*(sop_cost - cost); // More probable if low cost
 			if(add_input_prob < 0)
 			{
 				add_input_prob = 0;
 			}
-			double change_type_prob = sop_cost - cost; // More probable if low cost
+			double change_type_prob = 3*(sop_cost - cost); // More probable if low cost
 			if(change_type_prob < 0)
 			{
 				change_type_prob = 0;
 			}
-			double delete_gate_prob = cost; // More probable if high cost
+			double delete_gate_prob = 2*(cost); // More probable if high cost
 			if(delete_gate_prob < 0)
 			{
 				delete_gate_prob = 0;
@@ -516,12 +516,12 @@ public class BooleanTree {
 			{
 				add_gate_prob = 0;
 			}
-			double add_connection_prob = sop_cost - cost; // More probable if low cost
+			double add_connection_prob = 2*(sop_cost - cost); // More probable if low cost
 			if(add_connection_prob < 0)
 			{
 				add_connection_prob = 0;
 			}
-			double reassign_input_prob = sop_cost - cost; // More probable if low cost
+			double reassign_input_prob = 4*(sop_cost - cost); // More probable if low cost
 			if(reassign_input_prob < 0)
 			{
 				reassign_input_prob = 0;
