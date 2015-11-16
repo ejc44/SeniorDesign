@@ -491,10 +491,10 @@ public class BooleanTree {
 			int sop_cost = calcSOPCost(); // SOP Cost = maximum possible cost
 			
 			// Probabilities of each mutation
-			double delete_input_prob = 3*cost; // More probable if high cost
-			if(delete_input_prob < 0)
+			double delete_connection_prob = 3*cost; // More probable if high cost
+			if(delete_connection_prob < 0)
 			{
-				delete_input_prob = 0;
+				delete_connection_prob = 0;
 			}
 			double add_input_prob = 2*(sop_cost - cost); // More probable if low cost
 			if(add_input_prob < 0)
@@ -533,10 +533,10 @@ public class BooleanTree {
 			}
 			
 			
-			double total = delete_input_prob + add_input_prob + change_type_prob + delete_gate_prob + add_gate_prob + add_connection_prob + reassign_input_prob + delete_root_prob;
+			double total = delete_connection_prob + add_input_prob + change_type_prob + delete_gate_prob + add_gate_prob + add_connection_prob + reassign_input_prob + delete_root_prob;
 			
-			delete_input_prob = delete_input_prob / total;
-			add_input_prob = add_input_prob / total + delete_input_prob;
+			delete_connection_prob = delete_connection_prob / total;
+			add_input_prob = add_input_prob / total + delete_connection_prob;
 			change_type_prob = change_type_prob / total + add_input_prob;
 			delete_gate_prob = delete_gate_prob / total + change_type_prob;
 			add_gate_prob = add_gate_prob / total + delete_gate_prob;
@@ -545,10 +545,10 @@ public class BooleanTree {
 			delete_root_prob = delete_root_prob / total + reassign_input_prob;
 			
 			
-			if (p < delete_input_prob)
+			if (p < delete_connection_prob)
 			{
-				//System.out.println("Delete Intput");
-				mutate_success = deleteInput();
+				//System.out.println("Delete Connection");
+				mutate_success = deleteConenction();
 			}
 			else if (p < add_input_prob)
 			{
@@ -607,8 +607,8 @@ public class BooleanTree {
 	}
 	
 	
-	// Delete an input from the network
-	private boolean deleteInput()
+	// Delete connection between two nodes
+	private boolean deleteConenction()
 	{
 		Node child = selectNode(false); // Choose the child
 		int loops = 0;
@@ -643,7 +643,7 @@ public class BooleanTree {
 		return true;
 	}
 	
-	// Add an input to the network
+	// Add an input to a node
 	private boolean addInput()
 	{
 		Node child = selectNode(false); // Choose the child
@@ -924,7 +924,7 @@ public class BooleanTree {
 			}
 		}*/
 		
-		// Rassign inputs in cyclic order
+		// Reassign inputs in cyclic order
 		for(int i=0;i<all_nodes.size();i++) 
 		{
 			Node curr_node = all_nodes.get(i);
