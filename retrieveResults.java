@@ -5,11 +5,28 @@ import java.text.*;
 
 public class retrieveResults {
 	public static void main(String [] args) throws IOException {
+		ArrayList<String> lines = new ArrayList<String>();
+		String line;
+
+		try {
+			String basePath = new File("").getAbsolutePath();
+			String filename = basePath+"\\3VarOptimal.txt";
+			BufferedReader buff = new BufferedReader(new FileReader(filename));
+
+			while((line=buff.readLine())!=null) {
+				lines.add(line);
+			}
+			buff.close();
+		} catch (IOException e) {
+			System.out.println("Error reading 3VarOptimal file");
+		}
+
 		long startTime = System.currentTimeMillis();
 
 		double totalCosts = 0;
 		double totalSOPCosts = 0;
 		int numberFound = 0;
+		int greaterThanOptimal = 0;
 		String basePath = new File("").getAbsolutePath();
 		DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 		Calendar c = Calendar.getInstance();
@@ -25,14 +42,22 @@ public class retrieveResults {
 		for(long i=0;i<threeVarIndexes.size();i++) {
 			long index = threeVarIndexes.get((int) i);
 			int sopCost = calcSOPCost(3,index);
+			int optimalCost = Integer.parseInt(lines.get((int) index));
 
 			String indexFilename = basePath+"\\3var\\"+index+".txt";
 			int indexCost = getIndexCost(indexFilename);
 
-			if(indexCost > 0) {
+			//System.out.println(index);
+			//System.out.println(indexCost);
+
+			if(indexCost >= 0) {
 				totalCosts += indexCost;
 				totalSOPCosts += sopCost;
 				numberFound++;
+
+				if(indexCost > optimalCost) {
+					greaterThanOptimal++;
+				}
 			}
 		}
 
@@ -46,7 +71,8 @@ public class retrieveResults {
 		f.append(df.format(c.getTime())+",");
 		f.append(dbCostsAvg+",");
 		f.append(sopCostsAvg+",");
-		f.append(numberNotFound+"\n");
+		f.append(numberNotFound+",");
+		f.append(greaterThanOptimal+"\n");
 		f.flush();
 		f.close();
 
@@ -63,7 +89,7 @@ public class retrieveResults {
 			String indexFilename = basePath+"\\4var\\"+index+".txt";
 			int indexCost = getIndexCost(indexFilename);
 
-			if(indexCost > 0) {
+			if(indexCost >= 0) {
 				totalCosts += indexCost;
 				totalSOPCosts += sopCost;
 				numberFound++;
@@ -96,7 +122,7 @@ public class retrieveResults {
 			String indexFilename = basePath+"\\5var\\"+index+".txt";
 			int indexCost = getIndexCost(indexFilename);
 
-			if(indexCost > 0) {
+			if(indexCost >= 0) {
 				totalCosts += indexCost;
 				totalSOPCosts += sopCost;
 				numberFound++;
