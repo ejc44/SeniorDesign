@@ -330,7 +330,7 @@ public class BooleanTreeEqual {
 			for (int i = 0; i < all_nodes.size(); i++) // Check every node
 			{
 				Node curr = all_nodes.get(i);
-				if ( ((curr.children).size() == 0) && !curr.is_root && !curr.is_input) // If no children and not an input or root, remove it
+				if (!curr.is_root && !curr.is_input && (((curr.children).size() == 0) || ((curr.parents).size() == 0))) // If no children and not an input or root, remove it
 				{
 					for (int j = 0; j < (curr.parents).size(); j++) // Disconnect from its parents
 					{
@@ -348,7 +348,7 @@ public class BooleanTreeEqual {
 		
 		for (int i = 0; i < all_nodes.size(); i++)
 		{
-			Node node_i = all_nodes.get(i); // Iterate over each node in array list		
+			Node node_i = all_nodes.get(i); // Iterate over each node in array list
 			if (node_i.is_input)
 			{
 				cost = cost - 1; // Remove from number of nodes
@@ -667,6 +667,19 @@ public class BooleanTreeEqual {
 		{
 			Node par = (removed.parents).get(0);
 			disconnectNodes(par, removed);
+			if (!par.is_input && ((par.parents).size() < 2)) // In case fewer than two parents, need to add an additional parent
+			{
+				boolean success = false;
+				while (!success) // Add an input node as a parent but cannot already be a parent
+				{
+					Node newpar = selectNode(true);
+					if (!(par.parents).contains(newpar))
+					{
+						connectNodes(newpar, par);
+						success = true;
+					}
+				}
+			}
 		}
 
 		// From removed's children, remove the connection to 'removed'
@@ -906,11 +919,11 @@ public class BooleanTreeEqual {
 			}
 		}
 		
-		// Recalculate cost -- unnecessary
-		//calcCost();
+		// Recalculate cost
+		calcCost();
 		
-		// Update node levels -- unnecessary
-		//calcNodeLevels();
+		// Update node levels
+		calcNodeLevels();
 		
 		// Update the truth table
 		updateTable();
@@ -931,12 +944,33 @@ public class BooleanTreeEqual {
 			Node new_root = (root.parents).get(p);
 			new_root.is_root = true;
 			
+			int num_children = (new_root.children).size();
+			for (int i = 0 ; i < num_children; i++) // Disconnect the new root from all of its children
+			{
+				Node child = (new_root.children).get(0);
+				disconnectNodes(new_root,child);
+				if (!child.is_input && ((child.parents).size() < 2)) // If node now has fewer than two parents
+				{
+					boolean success = false;
+					while (!success) // Add an input node as a parent but cannot already be a parent
+					{
+						Node newpar = selectNode(true);
+						if (!(child.parents).contains(newpar))
+						{
+							connectNodes(newpar, child);
+							success = true;
+						}
+					}
+				}
+			}
+			
 			// Disconnect the root from all its parents
 			int num_parents = (root.parents).size();
 			for (int i = 0; i < num_parents; i++)
 			{
 				disconnectNodes((root.parents).get(0), root);
 			}
+			root.is_root = false;
 			
 			boolean contains = true;
 			
@@ -1266,6 +1300,55 @@ public class BooleanTreeEqual {
 
 	private String gateToString(Node n) {
 		String gate_type="";
+		
+		/*if (all_nodes.indexOf(n) == -1)
+		{
+			
+			System.out.println("Error: index of -1");
+			System.out.println("Num nodes: " + all_nodes.size());
+			System.out.println("Curr node type: " + n.gate_type);
+			if (n.is_root)
+			{
+				System.out.println("Is root");
+			}
+			else
+			{
+				System.out.println("Is not root");
+			}
+			if (n.is_input)
+			{
+				System.out.println("Is input");
+			}
+			else
+			{
+				System.out.println("Is not input");
+			}
+			System.out.println("Num parents: " + n.parents.size());
+			System.out.println("Num children: " + n.children.size());
+			for (int i = 0 ; i < n.children.size(); i++)
+			{
+				System.out.println("Child type: " + (n.children).get(i).gate_type);
+				System.out.println("Child children #: " + (n.children).get(i).children.size());
+				if ((n.children).get(i).is_root)
+				{
+					System.out.println("Child is root");
+				}
+				else
+				{
+					System.out.println("Child is not root");
+				}
+				if ((n.children).get(i).is_input)
+				{
+					System.out.println("Child is input");
+				}
+				else
+				{
+					System.out.println("Child is not input");
+				}
+			}
+			System.out.println(printNetwork());
+			System.exit(-1);
+		}*/
 		
 		switch(n.gate_type) { 
 			case X1:
