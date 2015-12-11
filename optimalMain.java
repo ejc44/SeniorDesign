@@ -1,9 +1,17 @@
+/*
+Evolutionary Algorithm for Boolean Logic Minimization by Gabrielle Clark & Emily Crabb is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+Based on a work at https://github.com/ejc44/SeniorDesign.
+*/
+
+
 import java.io.*;
 import java.lang.Math;
 import java.util.*;
 
 public class optimalMain {
 	public static void main(String [] args) throws IOException {
+		System.out.println("Evolutionary Algorithm for Boolean Logic Minimization by Gabrielle Clark & Emily Crabb is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License. Based on a work at https://github.com/ejc44/SeniorDesign.");
+
 		String choice;	// Holds user selection
 		Scanner user_input = new Scanner(System.in);
 

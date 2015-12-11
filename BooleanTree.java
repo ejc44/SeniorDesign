@@ -1,4 +1,10 @@
 /*
+Evolutionary Algorithm for Boolean Logic Minimization by Gabrielle Clark & Emily Crabb is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+Based on a work at https://github.com/ejc44/SeniorDesign.
+*/
+
+
+/*
 	Boolean Tree file
 	Can generate a canonical SOP network
 	
