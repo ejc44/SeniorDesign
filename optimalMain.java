@@ -138,8 +138,6 @@ public class optimalMain {
 						// Write file to db
 						boolean success = writeDBFile(network,indexFilename);
 						if(success) {
-							//System.out.println("Network written to database");
-
 							// Add the truth table to list of things in db
 							if(numVars==3) {
 								if(!threeVarIndexes.contains(index)) {
@@ -160,11 +158,7 @@ public class optimalMain {
 						for(int i=0;i<50;i++) {
 							network.mutate();
 
-							// Output Network
-							//s = network.printNetwork();
-							//System.out.println(s);
 							cost = network.getCost();
-							//System.out.println(cost);
 
 							sopCost = calcSOPCost(numVars, network.getTruthTable());
 
@@ -181,8 +175,6 @@ public class optimalMain {
 									// Write to DB
 									success = writeDBFile(network, indexFilename);
 									if(success) {
-										//System.out.println("Network written to database");
-
 										// Add the truth table to list of things in db
 										if(numVars==3) {
 											if(!threeVarIndexes.contains(index)) {
@@ -217,7 +209,7 @@ public class optimalMain {
 				}
 				int numVars = Integer.parseInt(u);
 
-				// Choose 5 different networks to mutate 100 times each
+				// Choose 100 different networks to mutate 50 times each
 				for(int i=0;i<100;i++) {
 					long index;
 					String indexFilename;
@@ -249,7 +241,6 @@ public class optimalMain {
 								long indexListVal = chooseIndex((long) fiveVarIndexes.size());
 								index = fiveVarIndexes.get((int) indexListVal);
 							}
-							//int[] table = getTableFromIndex(numVars,index);
 
 							indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
@@ -279,8 +270,6 @@ public class optimalMain {
 							// Write file to db
 							boolean success = writeDBFile(network,indexFilename);
 							if(success) {
-								//System.out.println("Network written to database");
-
 								// Add the truth table to list of things in db
 								if(numVars==3) {
 									if(!threeVarIndexes.contains(index)) {
@@ -308,7 +297,6 @@ public class optimalMain {
 							long indexListVal = chooseIndex((long) fiveVarIndexes.size());
 							index = fiveVarIndexes.get((int) indexListVal);
 						}
-						//int[] table = getTableFromIndex(numVars,index);
 
 						indexFilename = basePath+"\\"+numVars+"var\\"+index+".txt";
 
@@ -330,21 +318,11 @@ public class optimalMain {
 						network = new BooleanTree(numVars,linesFromFile);
 					}
 					
-					//System.out.println(index);
-					//System.out.println(network.printNetwork()); // Print before mutating
 					cost = network.getCost();
-					//System.out.println(network.getCost()); // Print cost
-					//System.out.println(Arrays.toString(network.getTruthTable()));
 					
-					// Mutate network 100 times
+					// Mutate network 50 times
 					for(int j=0;j<50;j++) {
 						network.mutate();
-
-						// Output Network
-						/*System.out.println(network.printNetwork()); // Print after mutating
-						cost = network.getCost();
-						System.out.println(network.getCost()); // Print cost
-						System.out.println(Arrays.toString(network.getTruthTable()));*/
 
 						int sopCost = calcSOPCost(numVars, network.getTruthTable());
 
@@ -357,8 +335,6 @@ public class optimalMain {
 							if(network.getCost() < cost || cost == -1) {
 								boolean success = writeDBFile(network, indexFilename);
 								if(success) {
-									//System.out.println("Network written to database");
-
 									if(numVars==3) {
 										if(!threeVarIndexes.contains(index)) {
 											threeVarIndexes.add(index);
@@ -681,8 +657,6 @@ public class optimalMain {
 			for(long i=0;i<(long) Math.pow(2,Math.pow(2,numVars));i++) {
 				String indexFilename = basepath+"\\"+numVars+"var\\"+i+".txt";
 				int hold = getIndexCost(indexFilename);
-
-				//System.out.println(i);
 
 				if(hold > 0) {
 					indexes.add(i);

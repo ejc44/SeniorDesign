@@ -1,3 +1,15 @@
+/*
+	Program used for testing.
+	Creates a csv file for 3, 4, and 5 variables. 
+	For each of the variable, the program calculates the average sum-of-products cost of the networks in the database, the average cost of the networks in the database, and the number of networks not in the database.
+	Additionally, for 3 variable networks, the program determines the number of networks in the database which have a higher cost than the known minimal cost (using the 3VarOptimal.txt file).
+*/
+
+/*
+Evolutionary Algorithm for Boolean Logic Minimization by Gabrielle Clark & Emily Crabb is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+Based on a work at https://github.com/ejc44/SeniorDesign.
+*/
+
 import java.io.*;
 import java.lang.Math;
 import java.util.*;
@@ -8,6 +20,8 @@ public class retrieveResults {
 		ArrayList<String> lines = new ArrayList<String>();
 		String line;
 
+		// Check if a csv file exists for the 3 variable testing
+		// Create a file if it doesn't already exist
 		try {
 			String basePath = new File("").getAbsolutePath();
 			String filename = basePath+"\\3VarOptimal.txt";
@@ -31,6 +45,7 @@ public class retrieveResults {
 		DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 		Calendar c = Calendar.getInstance();
 
+		// Read in the indexes which exist in the database
 		List<Long> threeVarIndexes = new ArrayList<>();
 		threeVarIndexes = getDBIndexes(3);
 		List<Long> fourVarIndexes = new ArrayList<>();
@@ -44,11 +59,9 @@ public class retrieveResults {
 			int sopCost = calcSOPCost(3,index);
 			int optimalCost = Integer.parseInt(lines.get((int) index));
 
+			// Retrieve the cost
 			String indexFilename = basePath+"\\3var\\"+index+".txt";
 			int indexCost = getIndexCost(indexFilename);
-
-			//System.out.println(index);
-			//System.out.println(indexCost);
 
 			if(indexCost >= 0) {
 				totalCosts += indexCost;
@@ -61,9 +74,11 @@ public class retrieveResults {
 			}
 		}
 
+		// Calculate averages
 		double dbCostsAvg = totalCosts / numberFound;
 		double sopCostsAvg = totalSOPCosts / numberFound;
 
+		// Add calculations to the file
 		FileWriter f = new FileWriter(basePath+"\\3var\\testResults.csv",true);
 
 		int numberNotFound = (int) Math.pow(2,Math.pow(2,3))-numberFound;
@@ -76,6 +91,7 @@ public class retrieveResults {
 		f.flush();
 		f.close();
 
+		// Reset values
 		totalCosts=0;
 		totalSOPCosts=0;
 		numberFound=0;
@@ -86,6 +102,7 @@ public class retrieveResults {
 			long index = fourVarIndexes.get((int) i);
 			int sopCost = calcSOPCost(4,index);
 
+			// Retrieve cost
 			String indexFilename = basePath+"\\4var\\"+index+".txt";
 			int indexCost = getIndexCost(indexFilename);
 
@@ -96,9 +113,11 @@ public class retrieveResults {
 			}
 		}
 
+		// Calculate aerages
 		dbCostsAvg = totalCosts / numberFound;
 		sopCostsAvg = totalSOPCosts / numberFound;
 
+		// Add calculations to the file
 		f = new FileWriter(basePath+"\\4var\\testResults.csv",true);
 
 		numberNotFound = (int) Math.pow(2,Math.pow(2,4))-numberFound;
@@ -110,6 +129,7 @@ public class retrieveResults {
 		f.flush();
 		f.close();
 
+		// Reset values
 		totalCosts=0;
 		totalSOPCosts=0;
 		numberFound=0;
@@ -119,6 +139,7 @@ public class retrieveResults {
 			long index = fiveVarIndexes.get((int) i);
 			int sopCost = calcSOPCost(5,index);
 
+			// Retrieve cost
 			String indexFilename = basePath+"\\5var\\"+index+".txt";
 			int indexCost = getIndexCost(indexFilename);
 
@@ -129,9 +150,11 @@ public class retrieveResults {
 			}
 		}
 
+		// Calculate averages
 		dbCostsAvg = totalCosts / numberFound;
 		sopCostsAvg = totalSOPCosts / numberFound;
 
+		// Add calculations to a file
 		f = new FileWriter(basePath+"\\5var\\testResults.csv",true);
 
 		numberNotFound = (int) Math.pow(2,Math.pow(2,5))-numberFound;
@@ -143,6 +166,7 @@ public class retrieveResults {
 		f.flush();
 		f.close();
 
+		// Display time it took to complete the file
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println(totalTime);

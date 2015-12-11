@@ -6,8 +6,6 @@ Based on a work at https://github.com/ejc44/SeniorDesign.
 
 /*
 	Boolean Tree file
-	Can generate a canonical SOP network
-	
 */
 
 import java.util.*;
@@ -53,7 +51,6 @@ public class BooleanTree {
 		private boolean is_input; // Special properties
 		private ArrayList<Node> parents; // Node array of the parents
 		private ArrayList<Node> children; // Node array of its children
-		//private int[] truth_value; // Truth table value up to that point	
 		private int node_level; // Number of levels between inputs and node (node_level = 0 for inputs)
 		
 		// Constructor
@@ -147,10 +144,6 @@ public class BooleanTree {
 		calcCost(); // Get the cost of the new tree
 		
 		updateTable(); // Update the table
-		
-		//System.out.println("The SOP terms is " + sop_terms);
-		//System.out.println("The num nodes is " + all_nodes.size());
-		//System.out.println("The cost is " + cost);
 	}
 
 
@@ -297,7 +290,6 @@ public class BooleanTree {
 	// Connect two nodes
 	private void connectNodes(Node parent, Node child)
 	{
-		//System.out.println("Connect nodes");
 		if (!(parent.children).contains(child)) // If not already in list
 		{
 			(parent.children).add(child); // Add the child to the parent's children list
@@ -311,7 +303,6 @@ public class BooleanTree {
 	// Disconnect two nodes
 	private void disconnectNodes(Node parent, Node child) 
 	{
-		//System.out.println("Disconnect nodes");
 		while ((child.parents).contains(parent)) // Remove all instances
 		{
 			(child.parents).remove(parent);	// Remove the parent from the child's parents list
@@ -326,8 +317,6 @@ public class BooleanTree {
 	// Update the cost variable
 	private void calcCost()
 	{
-		//System.out.println("Calculating cost");
-		
 		// First remove any now unconnected nodes (excluding inputs and root)
 		boolean removed = true;
 		while (removed) // Need while loop so can completely remove any orphaned sub-trees
@@ -488,12 +477,8 @@ public class BooleanTree {
 		while (mutate_success != true && attempts<100 && cost > 0)
 		{
 			double p = random_generator.nextDouble(); // Generate a probability
-			//System.out.println(p);
 			
-			//System.out.println("mutation attempt");
-			
-			// Choose type of mutation
-			
+			// Choose type of mutation			
 			int sop_cost = calcSOPCost(); // SOP Cost = maximum possible cost
 			
 			// Probabilities of each mutation
@@ -553,42 +538,34 @@ public class BooleanTree {
 			
 			if (p < delete_connection_prob)
 			{
-				//System.out.println("Delete Connection");
 				mutate_success = deleteConenction();
 			}
 			else if (p < add_input_prob)
 			{
-				//System.out.println("Add Input");
 				mutate_success = addInput();
 			}
 			else if (p < change_type_prob)
 			{
-				//System.out.println("Change Type");
 				mutate_success = changeType();
 			}
 			else if (p < delete_gate_prob)
 			{
-				//System.out.println("Delete Gate");
 				mutate_success = deleteGate();
 			}
 			else if (p < add_gate_prob)
 			{
-				//System.out.println("Add Gate");
 				mutate_success = addGate();
 			}
 			else if (p < add_connection_prob)
 			{
-				//System.out.println("Add Connection");
 				mutate_success = addConnection();
 			}
 			else if (p < reassign_input_prob)
 			{
-				//System.out.println("Reassign Inputs");
 				mutate_success = reassignInputs();
 			}
 			else
 			{
-				//System.out.println("Delete root");
 				mutate_success = deleteRoot();
 			}
 			attempts++;			
@@ -894,8 +871,6 @@ public class BooleanTree {
 	// Add connection
 	public boolean addConnection() 
 	{
-		//System.out.println("Adding connection");
-		
 		// Cannot connect to input - would be add input function
 		Node child = selectNode(false);
 		Node newPar = selectNode(false);
@@ -933,16 +908,6 @@ public class BooleanTree {
 	// Reassign inputs
 	private boolean reassignInputs()
 	{
-		//System.out.println("Reassigning inputs");
-	
-		/*// Generate an array list of all the inputs in use
-		ArrayList<Node> inputs = new ArrayList<Node>();
-		for(int i=0;i<all_nodes.size();i++) {
-			if((all_nodes.get(i)).is_input == true) {
-				inputs.add(all_nodes.get(i));
-			}
-		}*/
-		
 		// Reassign inputs in cyclic order
 		for(int i=0;i<all_nodes.size();i++) 
 		{
@@ -1094,62 +1059,7 @@ public class BooleanTree {
 	
 	// Check if two nodes trying to connect will be cyclically connected
 	private boolean isCyclic(Node par, Node child)
-	{
-		//System.out.println("Starting iscyclic");
-		
-		/*ArrayList<Node> descendants = new ArrayList<Node>(); // All of child's descendants
-		
-		for (int i = 0; i < (child.children).size(); i++)
-		{
-			Node curr = (child.children).get(i);
-			if (curr == par) // Break if cyclic
-			{
-				return true;
-			}
-			else
-			{
-				descendants.add(curr);
-			}
-		}
-		//System.out.println("iscyclic 2");
-		
-		while(descendants.size() > 0) // While are descendants
-		{
-			//System.out.println("cyclic 3");
-			//System.out.println(descendants.size());
-		
-			ArrayList<Node> new_children = new ArrayList<Node>();
-			
-			for (int i =0; i < descendants.size(); i++)
-			{
-				Node curr = descendants.get(i);
-				
-				for (int j= 0; j < (curr.children).size(); j++)
-				{
-					Node curr_child = (curr.children).get(j);
-					if (curr_child == par) // Break if cyclic
-					{
-						return true;
-					}
-					else
-					{
-						new_children.add(curr_child);
-					}
-				}
-			}
-			
-			descendants.clear();
-			
-			for (int i =0;i<new_children.size(); i++)
-			{
-				descendants.add(new_children.get(i));
-			}
-			
-			new_children.clear();
-		}
-		//System.out.println("cyclic 4");
-		return false;*/
-		
+	{	
 		if (par.node_level < child.node_level) // Cyclic-ness depends on node level only
 		{
 			return false;
@@ -1162,19 +1072,11 @@ public class BooleanTree {
 
 	private void updateTable()
 	{
-		//System.out.println("Updating truth table");
-	
 		int num_entries = (int)Math.pow(2,num_inputs);// Number of entries in the truth table
-		
-		//String expression = Integer.toBinaryString(num_entries);
-		//System.out.println(expression);
 		
 		for (int index = 0; index < num_entries; index++)
 		{
 			int expression = Integer.valueOf(Integer.toBinaryString(index)); // Number representing binary combination of inputs
-			
-			//System.out.print(truth_table[index] + " ");
-			
 			
 			boolean[] input_values = new boolean[num_inputs];
 			
@@ -1200,16 +1102,12 @@ public class BooleanTree {
 			{
 				truth_table[index] = 0;
 			}
-			//System.out.println(truth_table[index]);
 		}
 	}
 	
 	private boolean evaluateNetwork(boolean[] input_values, Node curr)
 	{
 		boolean value = false;
-	
-		//System.out.println("Gate type: " + curr.gate_type);
-		//System.out.println("Parents: " + curr.parents.size());
 	
 		if (curr.is_input)
 		{
@@ -1330,11 +1228,20 @@ public class BooleanTree {
 		return value;
 	}
 
+	/********************
+	Calls the print_tree_again funtion to get a string representation of the tree
 
+	Return: a string representation of the tree network
+	********************/
 	public String printNetwork() {
 		return print_tree_again(findRoot(),"",0);
 	}
 
+	/********************
+	Loops through all the nodes in the network, and determines which is set as the root node
+
+	Return: a Node which has it's is_root value set to true
+	********************/
 	private Node findRoot() {
 		Node root = (all_nodes).get(0);
 		for(int i=0;i<all_nodes.size();i++) {
@@ -1346,30 +1253,47 @@ public class BooleanTree {
 		return root;
 	}
 
+	/********************
+	Creates the text version of the tree which will be ouput to the user.
+	This is a recursive function.
+
+	Node child: A child node
+	String s: The string to be appended to
+	int level: The level of recursion (used for adding tabs to the string for ease of understanding the output)
+
+	Return: a string which represents the network tree
+	********************/
 	private String print_tree_again(Node child, String s, int level) {
+		// If the child node is the root, create the string 
 		if(child.is_root == true) {
 			s = s+"f = ";
 		}
 
+		// Adppend the number of tabs necessary for the current level
 		for(int i=0;i<level;i++) {
 			s = s+"\t";
 		}
+		// Append the gate to the string
 		s = s+gateToString(child);
 		
+		// Append an open parenthesis if there are parent nodes
 		if(child.is_input == false) {
 			s = s+"(\n";
 		}
 		
 		ArrayList<Node> parents = child.parents;
 		
+		// For each parent node, call this funtion with the parent as the child node, a blank string, and 1 added to the level value
 		for(int i=0;i<parents.size();i++) {
 			s = s+print_tree_again(parents.get(i),"",level+1);
 			
+			// If there is more than one parent, add a comma after each parent
 			if(parents.size()>1 && i<(parents.size()-1)) {
 				s = s+",\n";
 			}
 		}
 		
+		// Add a close parenthesis if there are parent nodes
 		if(child.is_input == false) {
 			s = s+")";
 		}
@@ -1377,57 +1301,15 @@ public class BooleanTree {
 		return s;
 	}
 
+	/********************
+	Convert the gate values of a node to string representation
+
+	Node n: a node in the network
+
+	Return: a string which represents the type of node 
+	********************/
 	private String gateToString(Node n) {
 		String gate_type="";
-		
-		/*if (all_nodes.indexOf(n) == -1)
-		{
-			
-			System.out.println("Error: index of -1");
-			System.out.println("Num nodes: " + all_nodes.size());
-			System.out.println("Curr node type: " + n.gate_type);
-			if (n.is_root)
-			{
-				System.out.println("Is root");
-			}
-			else
-			{
-				System.out.println("Is not root");
-			}
-			if (n.is_input)
-			{
-				System.out.println("Is input");
-			}
-			else
-			{
-				System.out.println("Is not input");
-			}
-			System.out.println("Num parents: " + n.parents.size());
-			System.out.println("Num children: " + n.children.size());
-			for (int i = 0 ; i < n.children.size(); i++)
-			{
-				System.out.println("Child type: " + (n.children).get(i).gate_type);
-				System.out.println("Child children #: " + (n.children).get(i).children.size());
-				if ((n.children).get(i).is_root)
-				{
-					System.out.println("Child is root");
-				}
-				else
-				{
-					System.out.println("Child is not root");
-				}
-				if ((n.children).get(i).is_input)
-				{
-					System.out.println("Child is input");
-				}
-				else
-				{
-					System.out.println("Child is not input");
-				}
-			}
-			System.out.println(printNetwork());
-			System.exit(-1);
-		}*/
 		
 		switch(n.gate_type) { 
 			case X1:
@@ -1489,9 +1371,17 @@ public class BooleanTree {
 		return gate_type;
 	}
 
+	/********************
+	Converts a string to it's corresponding gate representation.
+
+	String gate: a string string which represents a gate
+
+	Return: an int value which corresponds to the gate String 
+	********************/
 	private int stringToGate(String gate) {
 		int gateType=-1;
 
+		// Remove any integers from the end of the gate types
 		String gateMod = removeNum(gate);
 
 		switch(gateMod) {
@@ -1554,6 +1444,13 @@ public class BooleanTree {
 		return gateType;
 	}
 
+	/********************
+	Remove the number from the end of a gate string
+
+	String gate: A string representation of a gate, from the database file
+
+	Return: the gate String without the index value at the end
+	********************/
 	private String removeNum(String gate) {
 		if(gate.charAt(0) == '0' || gate.charAt(0) == '1') {
 			return gate;
@@ -1568,6 +1465,11 @@ public class BooleanTree {
 		}
 	}
 
+	/********************
+	Return to the user the truth table of the current network
+
+	Return: An integer array which represents the truth table
+	********************/
 	public int[] getTruthTable() {
 		return truth_table;
 	}
